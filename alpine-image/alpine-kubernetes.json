@@ -97,21 +97,22 @@
     }
   ],
   "post-processors": [
-    {
+    [{
       "type": "vagrant",
-      "keep_input_artifact": false
+      "keep_input_artifact": false,
+      "compression_level": 9
     },
     {
       "type": "atlas",
       "only": ["virtualbox-iso"],
-      "artifact": "{{user `atlas_user`}}/{{user `atlas_box`}}",
+      "artifact": "{{user `atlas_user`}}/alpine-{{user `alpine_version`}}-docker-{{user `docker_version`}}-kubernetes-{{user `kubernetes_version`}}",
       "token": "{{user `atlas_token`}}",
       "artifact_type": "vagrant.box",
       "metadata": {
         "provider": "virtualbox",
-        "description": "Latest Alpine Linux ({{user `alpine_version`}}), Docker ({{user `docker_version`}})) and Kubernetes ({{user `kubernetes_version`}}).",
-        "version": "{{user `alpine_version`}}-{{user `docker_version`}}-{{user `kubernetes_version`}}"
+        "description": "Latest Alpine Linux, Docker and Kubernetes.",
+        "version": "1.0.0"
       }
-    }
+    }]
   ]
 }
