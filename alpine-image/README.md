@@ -27,7 +27,7 @@ This image has been created as part of the alpine-k8s project: https://github.co
 You can download and run the image by: -
 
 e.g.
-``
+```
 vagrant box add alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
 vagrant init
 vagrant up
