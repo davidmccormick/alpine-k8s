@@ -27,7 +27,7 @@ do
   fi
 done
 
-for VAR in ATLAS_USER ATLAS_BOX ATLAS_TOKEN
+for VAR in ATLAS_USER ATLAS_TOKEN
 do
   if [[ -z $(eval "echo -n \"\$${VAR}\"") ]]; then
     echo "You must set environment variable ${VAR} before running."
