@@ -1,7 +1,7 @@
 set -eux
 
 echo "adding the community repository for docker"
-echo "http://mirrors.cug.edu.cn/alpine/edge/community/x86_64/" >>/etc/apk/repositories
+echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >>/etc/apk/repositories
 apk update
 
 echo "Installing docker"
