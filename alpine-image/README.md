@@ -28,8 +28,8 @@ You can download and run the image by: -
 
 e.g.
 ```
-vagrant box add alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
-vagrant init
+vagrant box add dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
+vagrant init vagrant init dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
 vagrant up
 ```
 
