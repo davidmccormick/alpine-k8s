@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "alpine" do |alpine|
 
-    alpine.vm.box = "dave-alpine-3.4.4"
+    alpine.vm.box = "dmcc/alpine-kubernetes"
 
     #alpine.ssh.username = "vagrant"
     #alpine.ssh.password = "vagrant"

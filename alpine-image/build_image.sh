@@ -62,16 +62,4 @@ echo "KUBEADM_URL = ${KUBEADM_URL}"
 echo ""
 export ALPINE_VERSION DOCKER_VERSION KUBERNETES_VERSION ALPINE_LATEST_ISO ALPINE_LATEST_SHA256 KUBELET_URL KUBECTL_URL KUBEADM_URL
 
-packer build \
-alpine-kubernetes.json
-
-# -var alpine_iso="http://dl-cdn.alpinelinux.org/alpine/${ALPINE_LATEST_ISO}"  \
-# -var alpine_sha="${ALPINE_LATEST_SHA256}"  \
-# -var kubelet_url="${KUBELET_URL}"  \
-# -var kubectl_url="${KUBECTL_URL}"  \
-# -var kubeadm_url="${KUBEADM_URL}"  \
-# -var alpine_version="${ALPINE_VERSION}" \
-# -var docker_version="${DOCKER_VERSION}" \
-# -var kubernetes_version="${KUBERNETES_VERSION}" \
-#alpine-kubernetes.json
-
+packer build alpine-kubernetes.json && packer push alpine-kubernetes.json
