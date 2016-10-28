@@ -9,9 +9,9 @@
       "kubelet_url": "{{env `KUBELET_URL`}}",
       "kubectl_url": "{{env `KUBECTL_URL`}}",
       "kubeadm_url": "{{env `KUBEADM_URL`}}",
-      "atlas_user": "{{env `ATLAS_USER_NAME`}}",
-      "atlas_box": "{{env `ATLAS_BOX_NAME`}}",
-      "atlas_token": "{{env `ATLAS_USER_TOKEN`}}"
+      "atlas_user": "{{env `ATLAS_USER`}}",
+      "atlas_box": "{{env `ATLAS_BOX`}}",
+      "atlas_token": "{{env `ATLAS_TOKEN`}}"
   },
   "push": {
     "name": "dmcc/alpine-k8s",

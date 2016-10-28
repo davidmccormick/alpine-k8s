@@ -15,7 +15,7 @@ done
 
 for VAR in ATLAS_USER ATLAS_BOX ATLAS_TOKEN
 do
-  if [[ -z $(eval "\$${VAR}") ]]; then
+  if [[ -z $(eval "echo -n \"\$${VAR}\"") ]]; then
     echo "You must set environment variable ${VAR} before running."
     FAILED_ENV="true"
   fi
