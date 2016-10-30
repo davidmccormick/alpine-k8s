@@ -6,18 +6,19 @@
       "kubernetes_version": "{{env `KUBERNETES_VERSION`}}",
       "alpine_latest_iso": "{{env `ALPINE_LATEST_ISO`}}",
       "alpine_latest_sha": "{{env `ALPINE_LATEST_SHA256`}}",
-      "kubelet_url": "{{env `KUBELET_URL`}}",
-      "kubectl_url": "{{env `KUBECTL_URL`}}",
-      "kubeadm_url": "{{env `KUBEADM_URL`}}",
-      "atlas_user": "{{env `ATLAS_USER`}}",
-      "atlas_box": "{{env `ATLAS_BOX`}}",
-      "atlas_token": "{{env `ATLAS_TOKEN`}}"
-  },
-  "push": {
-    "name": "dmcc/alpine-k8s",
-    "vcs": true
+      "kubernetes_binaries": "{{env `KUBERNETES_BINARIES`}}"
   },
   "provisioners": [
+    {
+      "type": "file",
+      "source": "{{user `kubernetes_binaries`}}kubectl",
+      "destination": "/usr/local/bin/kubectl"
+    },
+    {
+      "type": "file",
+      "source": "{{user `kubernetes_binaries`}}kubelet",
+      "destination": "/usr/local/bin/kubelet"
+    },
     {
       "type": "shell",
       "scripts": [
@@ -32,17 +33,12 @@
         "scripts/90virtualbox.sh",
         "scripts/99minimize.sh"
       ],
-      "environment_vars": [
-        "KUBEADM_URL={{user `kubeadm_url`}}",
-        "KUBELET_URL={{user `kubelet_url`}}",
-        "KUBECTL_URL={{user `kubectl_url`}}"
-      ],
       "override": {
         "virtualbox-iso": {
-          "execute_command": "/bin/sh -c 'chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}'"
+          "execute_command": "/bin/sh -c '{{ .Vars }} {{ .Path }}'"
         }
       }
-    } 
+    }
   ],
   "builders": [
     {
@@ -65,22 +61,17 @@
       "ssh_wait_timeout": "10m",
       "shutdown_command": "/sbin/poweroff",
 
-      "boot_wait": "30s",
+      "boot_wait": "20s",
       "boot_command": [
         "root<enter><wait>",
         "ifconfig eth0 up && udhcpc -i eth0<enter><wait>",
         "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
-        "setup-alpine -f answers<enter><wait5>",
+        "setup-alpine -f answers<enter><wait>",
         "vagrant<enter><wait>",
         "vagrant<enter><wait>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
+        "<wait10>",
         "y<enter>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
+        "<wait10><wait10>",
         "rc-service sshd stop<enter>",
         "mount /dev/sda3 /mnt<enter>",
         "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
@@ -101,18 +92,6 @@
       "type": "vagrant",
       "keep_input_artifact": false,
       "compression_level": 9
-    },
-    {
-      "type": "atlas",
-      "only": ["virtualbox-iso"],
-      "artifact": "{{user `atlas_user`}}/alpine-{{user `alpine_version`}}-docker-{{user `docker_version`}}-kubernetes-{{user `kubernetes_version`}}",
-      "token": "{{user `atlas_token`}}",
-      "artifact_type": "vagrant.box",
-      "metadata": {
-        "provider": "virtualbox",
-        "description": "Latest Alpine Linux, Docker and Kubernetes.",
-        "version": "1.0.0"
-      }
     }]
   ]
 }
