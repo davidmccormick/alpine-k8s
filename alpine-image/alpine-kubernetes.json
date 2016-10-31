@@ -21,6 +21,11 @@
       "destination": "/usr/local/bin/kubelet"
     },
     {
+      "type": "file",
+      "source": "{{user `kubernetes_binaries`}}cni.tar.gz",
+      "destination": "/tmp/cni.tar.gz"
+    },
+    {
       "type": "shell",
       "scripts": [
         "scripts/00base.sh",

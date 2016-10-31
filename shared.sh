@@ -28,7 +28,7 @@ cat <<-EOF >/etc/hosts
 EOF
 cat /etc/hosts
 
-my_ip=$(cat /etc/hosts | grep ${SET_HOSTNAME}) | awk '{print $1}')
+my_ip=$(cat /etc/hosts | grep ${SET_HOSTNAME} | awk '{print $1}')
 echo "My IP Address is $my_ip"
 
 echo "Setting up the private 10.250.250.0 network"
@@ -49,7 +49,7 @@ sed -e 's@^Defaults.*secure_path.*$@Defaults    secure_path = /usr/local/bin:/us
 echo "Configure and start the kubelet..."
 mkdir -p /etc/kubernetes/manifests
 mkdir -p /etc/cni/net.d
-/usr/local/bin/kubelet --kubeconfig=/etc/kubernetes/kubelet.conf --require-kubeconfig=true --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip}
+/usr/local/bin/kubelet --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip}
 
 echo "Route Kubernetes services network 100.64.0.0/12 via eth1 by default"
 route add -net 100.64.0.0/12 dev eth1
