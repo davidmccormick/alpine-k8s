@@ -20,14 +20,18 @@
 # Options
 # --force - delete and re-create an existing atlas box (default false)
 # --atlas - do the atlas box pushing or not (default false)
-# --local-alpine - use alpine packages mirrored in the local http server instead of remote ones. (default false)
+# --
 
 set -e
 
 FORCE="false"
 ATLAS="false"
+PACKER_LOGS="false"
 
+# Where to download the Alpine ISO and Packages from.
 ALPINE_MIRROR='dl-cdn.alpinelinux.org/alpine/'
+# Which Kubernetes components to build
+KUBERNETES_COMPONENTS="kubectl kubelet kubeadm"
 
 # read command line args
 for i in "$@"
@@ -37,7 +41,7 @@ case $i in
     ;;
     --atlas) ATLAS="true"
     ;;
-    --local-alpine) LOCALALPINE="true"
+    --packer-logs) PACKER_LOGS="true"
     ;;
     *) echo -e "\noption $i unknown\n"
        exit 1
@@ -174,17 +178,22 @@ echo -e "\n************************************************"
 echo -e "STEP 1: Kubernetes Compilation for Alpine Linux."
 echo -e "************************************************\n"
 
+KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
+export KUBERNETES_BINARIES
+echo -e "\nKubernetes binaries are here ${KUBERNETES_BINARIES}"
+
 if [[ ! -d "kubernetes-${KUBERNETES_VERSION#v}" ]]
 then
   echo -e "Downloading source: https://github.com/kubernetes/kubernetes/archive/${KUBERNETES_VERSION}.tar.gz"
   curl -k -L https://github.com/kubernetes/kubernetes/archive/${KUBERNETES_VERSION}.tar.gz >${KUBERNETES_VERSION}.tar.gz
   tar xfz ${KUBERNETES_VERSION}.tar.gz
+fi
 
-  echo -e "Checking for our build container 'kubebuild:alpine'"
-  if ! docker images | grep -e "kubebuild.*alpine"
-  then
-    echo -e "Building new 'kubebuild:alpine' container"
-    cat >Dockerfile <<EOT
+echo -e "\nDo we need to build our Kubernetes build container 'kubebuild:alpine'?"
+if ! docker images | grep -e "kubebuild.*alpine"
+then
+  echo -e "Building new 'kubebuild:alpine' container"
+  cat >Dockerfile <<EOT
 FROM golang:alpine
 RUN apk update && apk add linux-headers bash grep git xz findutils which rsync coreutils alpine-sdk docker
 RUN go get -u github.com/jteeuwen/go-bindata/go-bindata
@@ -195,22 +204,25 @@ RUN adduser build -D -H -s /bin/bash -u $(id -u)
 RUN chown -R $(id -u) /usr/local/go /go
 USER $(id -u)
 EOT
-    docker build . -t kubebuild:alpine
-  fi
-
-  echo -e "Building kubernetes kubelet and kubectl in docker build container kubebuild:alpine"
-  docker run -it --rm -v ${PWD}/kubernetes-${KUBERNETES_VERSION#v}:/usr/src/myapp -v /var/run/docker.sock:/var/run/docker.sock -w /usr/src/myapp kubebuild:alpine /bin/bash -c "make kubelet && make kubectl"
+  docker build . -t kubebuild:alpine
 else
-  echo -e "kubectl and kubelet binaries already exist"
+  echo -e "kubebuild:alpine already exists, skipping!\n"
 fi
 
-KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
-export KUBERNETES_BINARIES
-echo -e "\nKubernetes binaries are here ${KUBERNETES_BINARIES}"
+echo -e "\nChecking Kubernetes Components to build:-"
+for COMPONENT in ${KUBERNETES_COMPONENTS}; do
+  echo -e "\nChecking if I need to build a new version of ${COMPONENT}..."
+  if [[ ! -f "${KUBERNETES_BINARIES}/${COMPONENT}" ]]; then
+    echo -e "Running kubebuild:alpine to build ${COMPONENT}"
+    docker run -it --rm -v ${PWD}/kubernetes-${KUBERNETES_VERSION#v}:/usr/src/myapp -v /var/run/docker.sock:/var/run/docker.sock -w /usr/src/myapp kubebuild:alpine /bin/bash -c "make ${COMPONENT}"
+  else
+    echo -e "${COMPONENT} already exists, skipping build.\n"
+  fi
+done
 
-echo -e "\n*************************************"
-echo -e "STEP 2: Alpine Linux Vagrant Box Build"
-echo -e "**************************************\n"
+echo -e "\n********************************************************"
+echo -e "STEP 2: Alpine Linux-Docker-Kubernetes Vagrant Box Build"
+echo -e "********************************************************\n"
 echo -e "Writing Vagrant file"
 
 cat >Vagrantfile <<EOT
@@ -264,7 +276,11 @@ end
 EOT
 
 echo -e "\nBuilding packer template ${PACKER_TEMPLATE}\n"
-PACKER_LOG=1 packer build ${PACKER_TEMPLATE}
+if [[ "${PACKER_LOGS}" == "true" ]]; then
+  PACKER_LOG=1 packer build ${PACKER_TEMPLATE}
+else
+  packer build ${PACKER_TEMPLATE}
+fi
 echo -e "build_image completed ok\n"
 
 exit 0
