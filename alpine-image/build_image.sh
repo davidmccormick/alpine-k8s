@@ -20,7 +20,7 @@
 # Options
 # --force - delete and re-create an existing atlas box (default false)
 # --atlas - do the atlas box pushing or not (default false)
-# --
+# --packer-logs - increase the logging on the packer step.
 
 set -e
 
@@ -31,7 +31,7 @@ PACKER_LOGS="false"
 # Where to download the Alpine ISO and Packages from.
 ALPINE_MIRROR='dl-cdn.alpinelinux.org/alpine/'
 # Which Kubernetes components to build
-KUBERNETES_COMPONENTS="kubectl kubelet kubeadm"
+KUBERNETES_COMPONENTS="kubectl kubelet"
 
 # read command line args
 for i in "$@"
@@ -49,17 +49,12 @@ case $i in
 esac
 done
 
-# Which packer template are we going to use - with or without atlas upload?
-if [[ "${ATLAS}" == "true" ]]; then
-  PACKER_TEMPLATE="alpine-kubernetes-atlas.json"
-else
-  PACKER_TEMPLATE="alpine-kubernetes.json"
-fi
-
 echo -e "Builder for alpine-kubernetes vagrant box"
 echo -e "=========================================\n"
 
-REQUIRED="curl head awk sed tail packer"
+# Check make sure we have all the bits to run...
+
+REQUIRED="curl head awk sed tail packer docker"
 for BINARY in ${REQUIRED}
 do
   if ! which ${BINARY} >/dev/null 2>&1; then
@@ -81,7 +76,14 @@ if [[ "$ATLAS" == "true" ]]; then
   fi
 fi
 
-# Start the packer job to create our new alpine image
+if ! docker ps >/dev/null
+then
+  echo "Sorry, your user must be able to connect to docker to run this build."
+  echo "This usually means adding your user to the 'docker' group and restarting docker and your shell".
+  exit 1
+fi
+
+# Work out what we want to build...
 
 echo -n "Determining latest versions of components: "
 echo -n "Alpine"
@@ -127,8 +129,13 @@ fi
 
 export ALPINE_VERSION DOCKER_VERSION KUBERNETES_VERSION ALPINE_LATEST_ISO ALPINE_LATEST_SHA256 KUBELET_URL KUBECTL_URL KUBEADM_URL
 
-if [[ "${ATLAS}" == "true" ]]
-then
+#
+# Functions for manipulating the Hashicorp ATLAS API
+# I found this the most reliable way of making sure that my
+# boxes are created publically accessible.
+#
+
+function check_atlas {
   set +e
   # check login to atlas...
   if ! curl --fail -k -s https://atlas.hashicorp.com/api/v1 \
@@ -136,41 +143,59 @@ then
     -H "X-Atlas-Token: ${ATLAS_TOKEN}" >/dev/null
   then
     echo -e "\nSorry, I could not connect to Hashicorp Atlas - are you username and token correct?\n"
-    exit 1
+    set -e
+    return 1
   fi
+  set -e
+  return 0
+}
 
-  # check if box exists
-  if ! curl --fail -k -s https://atlas.hashicorp.com/api/v1/box/dmcc/${ATLAS_BOX} -X GET -H "X-Atlas-Token: ${ATLAS_TOKEN}" >/dev/null
+function atlas_call {
+  local VERB=$1
+  local CALL_PATH=$2
+  local EXTRAS=$3
+
+  local CALL="curl --fail -k -s \"${CALL_PATH}\" -X ${VERB} -H \"X-Atlas-Token: ${ATLAS_TOKEN}\" ${EXTRAS} >/dev/null"
+  echo "Calling $CALL"
+  if ! eval $CALL
   then
-    echo -e "Creating atlas box ${ATLAS_BOX}"
-    # assume it doesn't exist and create it as a new public box
-    if ! curl --fail -k -v https://atlas.hashicorp.com/api/v1/boxes -X POST -H "X-Atlas-Token: ${ATLAS_TOKEN}" -d box[name]="${ATLAS_BOX}" -d box[is_private]='false'
-    then
-      echo -e "Sorry couldn't create the new box ${ATLAS_BOX}"
-      exit 1
-    fi
+    echo "ATLAS API CALL FAILED!"
+    return 1
   else
-    if [[ "$FORCE" == "true" ]]; then
-      echo -e "Deleting box ${ATLAS_BOX}"
-      if ! curl --fail -k -s https://atlas.hashicorp.com/api/v1/box/dmcc/${ATLAS_BOX} -X DELETE -H "X-Atlas-Token: ${ATLAS_TOKEN}" >/dev/null
-      then
-       echo -e "Failed to delete box ${ATLAS_BOX}"
-       exit 1
-      fi
-      echo -e "Re-creating box ${ATLAS_BOX}"
-      if ! curl --fail -k -s https://atlas.hashicorp.com/api/v1/boxes -X POST -H "X-Atlas-Token: ${ATLAS_TOKEN}" -d box[name]="${ATLAS_BOX}"  -d box[is_private]='false' >/dev/null
-      then
-        echo -e "Sorry couldn't create box ${ATLAS_BOX}"
-        exit 1
-      fi
-    else
-      echo -e "Box ${ATLAS_BOX} already exists."
-      exit 1
-    fi
+    return 0
   fi
-fi
+}
 
-set -e 
+function atlas_box_exists {
+  local BOX=$1
+
+  atlas_call GET https://atlas.hashicorp.com/api/v1/box/dmcc/${BOX}
+}
+
+function atlas_box_create {
+  local BOX=$1
+
+  echo -e "Creating atlas box ${BOX}"
+  if ! atlas_call POST https://atlas.hashicorp.com/api/v1/boxes "-d box[name]=\"${BOX}\" -d box[is_private]='false'"
+  then
+    echo -e "Sorry couldn't create the new box ${BOX}"
+    return 1
+  fi
+  return 0
+}
+
+function atlas_box_delete {
+  local USER=$1
+  local BOX=$2
+
+  echo -e "Deleting atlas box ${BOX}"
+  if ! atlas_call DELETE https://atlas.hashicorp.com/api/v1/box/${USER}/${BOX}
+  then
+    echo -e "Sorry couldn't delete ${USER}'s box ${BOX}"
+    return 1
+  fi
+  return 0
+}
 
 # Download the latest kubernetes and build kubelet and kubectl.
 
@@ -223,6 +248,33 @@ done
 echo -e "\n********************************************************"
 echo -e "STEP 2: Alpine Linux-Docker-Kubernetes Vagrant Box Build"
 echo -e "********************************************************\n"
+
+# Which packer template are we going to use - with or without atlas upload?
+if [[ "${ATLAS}" == "true" ]]; then
+  PACKER_TEMPLATE="alpine-kubernetes-atlas.json"
+else
+  PACKER_TEMPLATE="alpine-kubernetes.json"
+fi
+
+if [[ "${ATLAS}" == "true" ]]
+then
+  check_atlas
+
+  # check if box exists
+  if ! atlas_box_exists "${ATLAS_BOX}"
+  then
+    atlas_box_create "${ATLAS_BOX}" || exit 1
+  else
+    if [[ "$FORCE" == "true" ]]; then
+      echo -e "Forced re-creation of box ${ATLAS_BOX}"
+      atlas_box_delete "${ATLAS_USER}" "${ATLAS_BOX}" || exit 1
+      atlas_box_create "${ATLAS_BOX}" || exit 1
+    else
+      echo -e "Box ${ATLAS_BOX} already exists."
+    fi
+  fi
+fi
+
 echo -e "Writing Vagrant file"
 
 cat >Vagrantfile <<EOT

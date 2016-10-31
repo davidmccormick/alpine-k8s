@@ -6,7 +6,8 @@
       "kubernetes_version": "{{env `KUBERNETES_VERSION`}}",
       "alpine_latest_iso": "{{env `ALPINE_LATEST_ISO`}}",
       "alpine_latest_sha": "{{env `ALPINE_LATEST_SHA256`}}",
-      "kubernetes_binaries": "{{env `KUBERNETES_BINARIES`}}"
+      "kubernetes_binaries": "{{env `KUBERNETES_BINARIES`}}",
+      "kubeadm_url": "{{env `KUBEADM_URL`}}"
   },
   "provisioners": [
     {
@@ -18,11 +19,6 @@
       "type": "file",
       "source": "{{user `kubernetes_binaries`}}kubelet",
       "destination": "/usr/local/bin/kubelet"
-    },
-    {
-      "type": "file",
-      "source": "{{user `kubernetes_binaries`}}kubeadm",
-      "destination": "/usr/local/bin/kubeadm"
     },
     {
       "type": "shell",
@@ -37,6 +33,9 @@
         "scripts/25kubernetes.sh",
         "scripts/90virtualbox.sh",
         "scripts/99minimize.sh"
+      ],
+      "environment_vars": [
+        "KUBEADM_URL={{user `kubeadm_url`}}"
       ],
       "override": {
         "virtualbox-iso": {
