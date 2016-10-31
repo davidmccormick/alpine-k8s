@@ -9,9 +9,6 @@ echo "***************************************"
 echo "*       RUNNING SHARED SETUP          *"
 echo "***************************************"
 
-echo "Add /usr/local/bin to PATH"
-export PATH="$PATH:/usr/local/bin"
-
 echo "Setting hostname to ${SET_HOSTNAME}"
 hostname ${SET_HOSTNAME}
 
@@ -42,19 +39,47 @@ iface eth1 inet static
 EOT
 /etc/init.d/networking restart
 
-echo "Adding /usr/local/bin and /usr/local/sbin to root's path after sudo"
-sed -e 's@^Defaults.*secure_path.*$@Defaults    secure_path = /usr/local/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin@' -i /etc/sudoers
-
-
-echo "Configure and start the kubelet..."
-mkdir -p /etc/kubernetes/manifests
-mkdir -p /etc/cni/net.d
-/usr/local/bin/kubelet --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip}
-
 echo "Route Kubernetes services network 100.64.0.0/12 via eth1 by default"
 route add -net 100.64.0.0/12 dev eth1
+
+mkdir -p /etc/kubernetes/manifests
+mkdir -p /etc/cni/net.d
+
+echo "Create kubelet service..."
+cat >/etc/init.d/kubelet <<EOT
+#!/sbin/openrc-run 
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# \$Header: \$
+
+depend() {
+  need net
+  need docker
+  need sysfs
+}
+
+start_pre() {
+  ulimit -n 1048576
+  return 0
+}
+
+start() {
+  ebegin "Starting Kubelet"
+  start-stop-daemon --background --start --exec /usr/local/bin/kubelet --make-pidfile --pidfile /run/kubelet.pid \
+  -- --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip} 
+  eend \$?
+}
+
+stop() {
+   ebegin "Stopping Kubelet"
+   start-stop-daemon --stop --exec /usr/local/bin/kubelet --pidfile /run/kubelet.pid
+   eend \$?
+}
+EOT
+chmod +x /etc/init.d/kubelet
+rc-update add kubelet
+rc-service kubelet start
 
 echo "***************************************"
 echo "*       FINISHED SHARED SETUP         *"
 echo "***************************************"
-

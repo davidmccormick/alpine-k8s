@@ -15,13 +15,8 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "{{user `kubernetes_binaries`}}kubectl",
-      "destination": "/usr/local/bin/kubectl"
-    },
-    {
-      "type": "file",
-      "source": "{{user `kubernetes_binaries`}}kubelet",
-      "destination": "/usr/local/bin/kubelet"
+      "source": "{{user `kubernetes_binaries`}}hyperkube",
+      "destination": "/usr/local/bin/hyperkube"
     },
     {
       "type": "file",
@@ -114,6 +109,17 @@
       "metadata": {
         "provider": "virtualbox",
         "description": "Latest Alpine Linux, Docker and Kubernetes."
+      }
+    },
+    {
+      "type": "atlas",
+      "only": ["virtualbox-iso"],
+      "artifact": "{{user `atlas_user`}}/alpine-docker-kubernetes",
+      "token": "{{user `atlas_token`}}",
+      "artifact_type": "vagrant.box",
+      "metadata": {
+        "provider": "virtualbox",
+        "description": "Latest Alpine Linux ({{user `alpine_version`}}), Docker ({{user `docker_version`}}) and Kubernetes ({{user `kubernetes_version`}})."
       }
     }]
   ]

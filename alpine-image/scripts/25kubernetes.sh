@@ -12,8 +12,7 @@ echo "Creating hyperkube symlinks..."
 cd /usr/local/bin
 ./hyperkube --make-symlinks
 
-echo "Extracting kubernetes cni binaries..."
-mkdir -p /opt/cni
+mkdir -p /opt/cni /etc/kubernetes/manifests /etc/cni/net.d
 cd /opt/cni
 tar xvfpz /tmp/cni.tar.gz
 rm -f /tmp/cni.tar.gz
