@@ -10,6 +10,6 @@ EOT
 echo "Performing an update/upgrade"
 apk update
 apk upgrade
-apk add bash
+apk add bash util-linux
 
 exit 0

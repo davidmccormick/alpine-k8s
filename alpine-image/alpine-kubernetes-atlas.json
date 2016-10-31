@@ -108,7 +108,7 @@
       "artifact_type": "vagrant.box",
       "metadata": {
         "provider": "virtualbox",
-        "description": "Latest Alpine Linux, Docker and Kubernetes."
+        "description": "Latest Alpine Linux, Docker and Kubernetes.  For more instructions see https://github.com/davidmccormick/alpine-k8s.  The source to build this image is in the alpine-image directory."
       }
     },
     {
@@ -119,7 +119,7 @@
       "artifact_type": "vagrant.box",
       "metadata": {
         "provider": "virtualbox",
-        "description": "Latest Alpine Linux ({{user `alpine_version`}}), Docker ({{user `docker_version`}}) and Kubernetes ({{user `kubernetes_version`}})."
+        "description": "Latest Alpine Linux ({{user `alpine_version`}}), Docker ({{user `docker_version`}}) and Kubernetes ({{user `kubernetes_version`}}).  For more instructions see https://github.com/davidmccormick/alpine-k8s.  The source to build this image is in the alpine-image directory."
       }
     }]
   ]
