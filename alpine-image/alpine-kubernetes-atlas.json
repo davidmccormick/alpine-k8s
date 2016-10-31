@@ -113,8 +113,7 @@
       "artifact_type": "vagrant.box",
       "metadata": {
         "provider": "virtualbox",
-        "description": "Latest Alpine Linux, Docker and Kubernetes.",
-        "version": "1.0.0"
+        "description": "Latest Alpine Linux, Docker and Kubernetes."
       }
     }]
   ]

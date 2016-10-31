@@ -31,7 +31,7 @@ PACKER_LOGS="false"
 # Where to download the Alpine ISO and Packages from.
 ALPINE_MIRROR='dl-cdn.alpinelinux.org/alpine/'
 # Which Kubernetes components to build
-KUBERNETES_COMPONENTS="kubectl kubelet"
+KUBERNETES_COMPONENTS="hyperkube kubectl kubelet"
 
 # read command line args
 for i in "$@"
@@ -204,8 +204,10 @@ echo -e "STEP 1: Kubernetes Compilation for Alpine Linux."
 echo -e "************************************************\n"
 
 KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
+mkdir -p ${KUBERNETES_BINARIES}
 export KUBERNETES_BINARIES
-echo -e "\nKubernetes binaries are here ${KUBERNETES_BINARIES}"
+
+echo -e "\nKubernetes binaries will be deployed from ${KUBERNETES_BINARIES}"
 
 if [[ ! -d "kubernetes-${KUBERNETES_VERSION#v}" ]]
 then

@@ -12,13 +12,8 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "{{user `kubernetes_binaries`}}kubectl",
-      "destination": "/usr/local/bin/kubectl"
-    },
-    {
-      "type": "file",
-      "source": "{{user `kubernetes_binaries`}}kubelet",
-      "destination": "/usr/local/bin/kubelet"
+      "source": "{{user `kubernetes_binaries`}}hyperkube",
+      "destination": "/usr/local/bin/hyperkube"
     },
     {
       "type": "file",

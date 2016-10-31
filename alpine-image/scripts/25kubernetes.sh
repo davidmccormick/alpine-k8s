@@ -6,7 +6,11 @@ echo ""
 echo "kubeadm: $KUBEADM_URL"
 curl -s -k $KUBEADM_URL >/usr/local/bin/kubeadm
 
-chmod +x /usr/local/bin/kubelet /usr/local/bin/kubectl /usr/local/bin/kubeadm
+chmod +x /usr/local/bin/kubeadm /usr/local/bin/hyperkube
+
+echo "Creating hyperkube symlinks..."
+cd /usr/local/bin
+./hyperkube --make-symlinks
 
 echo "Extracting kubernetes cni binaries..."
 mkdir -p /opt/cni
