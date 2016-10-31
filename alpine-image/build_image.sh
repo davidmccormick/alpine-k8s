@@ -107,6 +107,7 @@ KUBEADM_URL="https://storage.googleapis.com/kubeadm/${KUBEADM_LATEST}"
 echo -e ""
 
 ATLAS_BOX="alpine-${ALPINE_VERSION}-docker-${DOCKER_VERSION}-kubernetes-${KUBERNETES_VERSION}"
+ATLAS_BOXES="${ATLAS_BOX} alpine-docker-kubernetes"
 
 if [[ -d "output-virtualbox-iso" ]]; then
   echo -e "Removing existing output-virtualbox-iso"
@@ -124,7 +125,7 @@ if [[ "${ATLAS}" == "true" ]]; then
   echo -e "\nATLAS:-"
   echo -e "ATLAS_USER : ${ATLAS_USER}"
   echo -e "ATLAS_TOKEN: ${ATLAS_TOKEN}"
-  echo -e "ATLAS_BOX  : ${ATLAS_BOX}\n"
+  echo -e "ATLAS_BOXES  : ${ATLAS_BOXES}\n"
 fi
 
 export ALPINE_VERSION DOCKER_VERSION KUBERNETES_VERSION ALPINE_LATEST_ISO ALPINE_LATEST_SHA256 KUBELET_URL KUBECTL_URL KUBEADM_URL
@@ -273,21 +274,23 @@ fi
 
 if [[ "${ATLAS}" == "true" ]]
 then
-  check_atlas
-
-  # check if box exists
-  if ! atlas_box_exists "${ATLAS_BOX}"
-  then
-    atlas_box_create "${ATLAS_BOX}" || exit 1
-  else
-    if [[ "$FORCE" == "true" ]]; then
-      echo -e "Forced re-creation of box ${ATLAS_BOX}"
-      atlas_box_delete "${ATLAS_USER}" "${ATLAS_BOX}" || exit 1
-      atlas_box_create "${ATLAS_BOX}" || exit 1
+  check_atlas 
+  for abox in ${ATLAS_BOXES}
+  do
+    # check if box exists
+    if ! atlas_box_exists "${abox}"
+    then
+      atlas_box_create "${abox}" || exit 1
     else
-      echo -e "Box ${ATLAS_BOX} already exists."
+      if [[ "$FORCE" == "true" ]]; then
+        echo -e "Forced re-creation of box ${abox}"
+        atlas_box_delete "${ATLAS_USER}" "${abox}" || exit 1
+        atlas_box_create "${abox}" || exit 1
+      else
+        echo -e "Box ${abox} already exists."
+      fi
     fi
-  fi
+  done
 fi
 
 echo -e "Writing Vagrant file"
