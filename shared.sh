@@ -34,7 +34,6 @@ auto eth1
 iface eth1 inet static
     address ${my_ip}
     netmask 255.255.255.0
-    gateway 10.250.250.1
     hostname ${SET_HOSTNAME}
 EOT
 /etc/init.d/networking restart
@@ -65,8 +64,8 @@ start_pre() {
 
 start() {
   ebegin "Starting Kubelet"
-  start-stop-daemon --background --start --exec /usr/local/bin/kubelet --make-pidfile --pidfile /run/kubelet.pid \
-  -- --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip} 
+  start-stop-daemon --background --start --exec /usr/local/bin/kubelet --make-pidfile --pidfile /run/kubelet.pid --stdout /var/log/kubelet.log --stderr /var/log/kubelet.log  \
+  -- --require-kubeconfig --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip} 
   eend \$?
 }
 
@@ -79,6 +78,24 @@ EOT
 chmod +x /etc/init.d/kubelet
 rc-update add kubelet
 rc-service kubelet start
+
+echo "Adding cron check to restart kubelet.,,"
+echo "*       *       *       *       *       run-parts /etc/periodic/1min" >>/etc/crontabs/root
+mkdir -p /etc/periodic/1min
+rc-service crond restart
+
+cat >/etc/periodic/1min/kubelet <<EOT
+#!/bin/bash
+
+# checks for working kubelet and tries to restart it if it does not find one.
+
+if ! rc-service kubelet status
+then
+  rc-service kubelet restart
+fi
+EOT
+chmod +x /etc/periodic/1min/kubelet
+
 
 echo "***************************************"
 echo "*       FINISHED SHARED SETUP         *"
