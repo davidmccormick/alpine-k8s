@@ -107,7 +107,7 @@ KUBEADM_URL="https://storage.googleapis.com/kubeadm/${KUBEADM_LATEST}"
 echo -e ""
 
 ATLAS_BOX="alpine-${ALPINE_VERSION}-docker-${DOCKER_VERSION}-kubernetes-${KUBERNETES_VERSION}"
-ATLAS_BOXES="${ATLAS_BOX} alpine-docker-kubernetes"
+ATLAS_BOXES="${ATLAS_BOX}"
 
 if [[ -d "output-virtualbox-iso" ]]; then
   echo -e "Removing existing output-virtualbox-iso"
