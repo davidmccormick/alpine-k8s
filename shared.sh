@@ -5,10 +5,6 @@ set -e
 # This script sets up Etcd, Flannel and Kubernetes Master
 # for a single master and 3 minions configuration.
 
-echo "***************************************"
-echo "*       RUNNING SHARED SETUP          *"
-echo "***************************************"
-
 echo "Setting hostname to ${SET_HOSTNAME}"
 hostname ${SET_HOSTNAME}
 
@@ -96,7 +92,3 @@ fi
 EOT
 chmod +x /etc/periodic/1min/kubelet
 
-
-echo "***************************************"
-echo "*       FINISHED SHARED SETUP         *"
-echo "***************************************"
