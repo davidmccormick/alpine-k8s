@@ -47,7 +47,7 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]   
       end  
-      minion01_config.vm.provision :shell, path: "shared.sh", :privileged => true
+      minion01_config.vm.provision :shell, path: "shared.sh", :privileged => true, env: {"SET_HOSTNAME" => "minion01.example.com"}
       minion01_config.vm.provision :shell, path: "minion.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token }
   end
 
@@ -57,7 +57,7 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]   
       end  
-      minion02_config.vm.provision :shell, path: "shared.sh", :privileged => true
+      minion02_config.vm.provision :shell, path: "shared.sh", :privileged => true, env: {"SET_HOSTNAME" => "minion02.example.com"}
       minion02_config.vm.provision :shell, path: "minion.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token }
   end
 end
