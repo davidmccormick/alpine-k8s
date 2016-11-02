@@ -52,7 +52,7 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
   config.vm.define :minion02 do |minion02_config|
-      minion02_config.vm.network "private_network", ip:"10.250.250.11", , auto_config: false
+      minion02_config.vm.network "private_network", ip:"10.250.250.11", auto_config: false
       config.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]   
