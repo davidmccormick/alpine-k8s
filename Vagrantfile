@@ -35,6 +35,7 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
         vb.customize ["modifyvm", :id, "--cpus", "2"]   
       end  
       master01_config.vm.provision :shell, path: "shared.sh", :privileged => true, env: {"SET_HOSTNAME" => "master.example.com"}
+      master01_config.vm.provision :file, source: "canal.yaml", destination: "~/canal.yaml"
       master01_config.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token }
   end
 
