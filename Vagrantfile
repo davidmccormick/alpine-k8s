@@ -22,10 +22,9 @@ config.ssh.insert_key = false
 config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.box = "dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.5"
 
-  if Vagrant.has_plugin?("vagrant-cachier")
-      # Configure cached packages to be shared between instances of the same base box.
-      # More info on http://fgrehm.viewdocs.io/vagrant-cachier/usage
-      config.cache.scope = :box
+  # disable vbguest updates as this does not work on alpine.
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
   end
 
   config.vm.define :master do |master01_config|
