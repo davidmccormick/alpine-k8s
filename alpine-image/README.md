@@ -8,7 +8,9 @@ Features: -
  * \-\-atlas will include uploading the built image to Hashicorp Atlas
  * \-\-force will force a rebuild of the vagrant image and upload to atlas.
  * You must set ATLAS_USER and ATLAS_TOKEN variables in order to upload to Atlas. 
-* The image creation is split into two stages, 1) Lookup versions and build Alpine Kubernetes hyperkube binary and CNI, 2) Run packer to create the Alpine image run provisioning scripts which add docker and our kubernetes binaries.
+* The image creation is split into two stages: -
+ 1) Lookup versions and build Alpine Kubernetes hyperkube binary and CNI
+ 2) Run packer to create the Alpine image run provisioning scripts which add docker and our kubernetes binaries.
 * The kubernetes compilation requires go, alpine muscl libs and some extra packages and it was easiest to use the official golang:alpine docker image as a base.
  * You must give your user access to docker in order to perform the build (don't run as root).
 
