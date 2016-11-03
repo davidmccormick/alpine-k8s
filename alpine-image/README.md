@@ -28,7 +28,7 @@ Build creates a virtualbox vagrant image and uploads to Atlas by default.
 You must provide your atlas credentials to build, run: -
 
 ```
-ATLAS_USER=dmcc ATLAS_TOKEN=xyz123etc123 ./build_image.sh [--force]
+ATLAS_USER=dmcc ATLAS_TOKEN=xyz123etc123 ./build_image.sh --atlas [--force]
 ```
 
 The build_image.sh script will automatically lookup the latest versions of:-
