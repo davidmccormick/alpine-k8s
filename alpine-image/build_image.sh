@@ -288,6 +288,7 @@ then
         atlas_box_create "${abox}" || exit 1
       else
         echo -e "Box ${abox} already exists."
+        [[ "${FORCE}" == "true" ]] || exit 0
       fi
     fi
   done
