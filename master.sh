@@ -28,7 +28,7 @@ curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubead
 sed -e 's/100.78.232.136/100.64.0.2/' -i /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
 echo "Setting up canal..."
-kubectl create -f /home/vagrant/canal.yaml
+kubectl create -f /root/canal.yaml
 echo "Allowing calico policy controller and configure-canal pods to run on the master.."
 kubectl annotate pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 kubectl annotate pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
