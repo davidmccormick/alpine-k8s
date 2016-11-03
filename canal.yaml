@@ -6,12 +6,12 @@ metadata:
   namespace: kube-system
 data:
   # Configure this with the location of your etcd cluster.
-  etcd_endpoints: "http://10.250.250.2:6666"
+  etcd_endpoints: "http://100.78.232.136:6666"
 
   # The interface used by canal for host <-> host communication.
   # If left blank, then the interface is chosing using the node's
   # default route.
-  canal_iface: "eth1"
+  canal_iface: ""
 
   # Whether or not to masquerade traffic to destinations not within
   # the pod network.
@@ -81,27 +81,27 @@ spec:
           hostPath:
             path: /var/etcd
 
-#---
-#
-## This manfiest installs the Service which gets traffic to the Calico
-## etcd.
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  labels:
-#    k8s-app: canal-etcd
-#  name: canal-etcd
-#  namespace: kube-system
-#spec:
-#  # Select the canal-etcd pod running on the master.
-#  selector:
-#    k8s-app: canal-etcd
-#  # This ClusterIP needs to be known in advance, since we cannot rely
-#  # on DNS to get access to etcd. 
-#  clusterIP: 100.78.232.136
-#  ports:
-#    - port: 6666
-#
+---
+
+# This manfiest installs the Service which gets traffic to the Calico
+# etcd.
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: canal-etcd
+  name: canal-etcd
+  namespace: kube-system
+spec:
+  # Select the canal-etcd pod running on the master.
+  selector:
+    k8s-app: canal-etcd
+  # This ClusterIP needs to be known in advance, since we cannot rely
+  # on DNS to get access to etcd. 
+  clusterIP: 100.78.232.136
+  ports:
+    - port: 6666
+
 ---
 
 

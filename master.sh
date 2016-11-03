@@ -29,8 +29,9 @@ sed -e 's/100.78.232.136/100.64.0.2/' -i /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
 echo "Setting up canal..."
 kubectl create -f /home/vagrant/canal.yaml
-#echo "Installing weave..."
-#kubectl create -f https://git.io/weave-kube
+echo "Allowing calico policy controller and configure-canal pods to run on the master.."
+kubectl annotate pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+kubectl annotate pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
