@@ -1,4 +1,4 @@
-# Alpine - Docker - Kubernetes
+# Alpine - Docker - Kubernetes Image
 
 A builder for creating a virtualbox vagrant box with the latest Alpine operating system, docker and the latest available kubernetes binaries compiled for the muscl c library.
 
