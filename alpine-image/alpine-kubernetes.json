@@ -29,6 +29,7 @@
         "scripts/02sshd.sh",
         "scripts/03vagrant.sh",
         "scripts/04sudoers.sh",
+        "scripts/05cron.sh",
         "scripts/20docker.sh",
         "scripts/25kubernetes.sh",
         "scripts/90virtualbox.sh",
