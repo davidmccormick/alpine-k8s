@@ -1,5 +1,11 @@
 # Kubernetes on Alpine
 
+Components: -
+* Alpine Linux
+* Docker
+* Kubernetes (hyperkube, kubeadm and cni)
+* Canal (Calico/Flannel) networking
+
 This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base.  Why only use Alpine within Docker containers?  We want our kubernetes infrastructure to be as minimal and simple as possible, right?
 
 Configuring Kubernetes is somewhat complicated right now with a whole mix of different choices.  I really like the idea of [kubeadm](http://kubernetes.io/docs/getting-started-guides/kubeadm/) as it intends to make the setup simpler and makes extending an existing cluster really easy!  kubeadm is alpha and is lacking certain functionality right now, for example it can not create multi-master clusters, but this will change (or I'll be tempted down the of doing everything [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way).
