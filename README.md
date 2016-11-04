@@ -10,8 +10,6 @@ This is an experimental project with the goal of creating the latest kubernetes 
 
 My aim is to set up our cluster __the easy way__ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way).
 
-I've chosen 'Docker' as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
-
 ## Bringing up the kubernetes cluster
 
 ```
@@ -45,6 +43,10 @@ The *shared.sh* script sets up the networking and makes sure that the kubernetes
 The *master.sh* script sets up the cluster and runs kubeadm and once available it is responsible for installing our addons such as canal networking and dashboard.
 
 The *minion.sh* script runs the kubeadm command to join the cluster.
+
+### No Rkt
+
+I've chosen **Docker** as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
 
 ## Present Limitations
 1. No master HA.
