@@ -6,30 +6,47 @@ Components: -
 * Kubernetes (hyperkube, kubeadm and cni)
 * Canal (Calico/Flannel) networking
 
-This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base.  Why only use Alpine within Docker containers?  We want our kubernetes infrastructure to be as minimal and simple as possible, right?
+This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base running on Vagrant.  I want to make the kubernetes footprint as small and simple as possible.
 
-Configuring Kubernetes is somewhat complicated right now with a whole mix of different choices.  I really like the idea of [kubeadm](http://kubernetes.io/docs/getting-started-guides/kubeadm/) as it intends to make the setup simpler and makes extending an existing cluster really easy!  kubeadm is alpha and is lacking certain functionality right now, for example it can not create multi-master clusters, but this will change (or I'll be tempted down the of doing everything [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way)).
+My aim is to set up our cluster _the easy way_ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way)).
 
 I've chosen 'Docker' as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
 
-## Usage notes
-
-This image has been created as part of the alpine-k8s project: https://github.com/davidmccormick/alpine-k8s You can download and run the image by: -
-
-e.g.
+## Bringing up the kubernetes cluster
 
 ```
+git clone https://github.com/davidmccormick/alpine-k8s
 vagrant box add dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
-vagrant init vagrant init dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
 vagrant up
 ```
+## Extra information
 
-Virtualbox Guest Additions do not build/install on v3.4 of Alpine.
+### What do we get?
 
-private network needs be configured as static in Vagrantfile in order to use folder sharing. If it is set to DHCP, Virtualbox will not see the address assigned to the interface, therefore, Vagrant will not be able to retrieve it to configure NFS.
-folder sharing should be configured to use NFS in Vagrantfile.
-bash is installed by default so config.ssh.shell="/bin/sh" is not necessary.
+The installation presently installs one master (master.example.com) and two minions (minion01/2.example.com).  THe installation is performed by kubeadm and so most of the kubernetes components (execept kubectl, kubelet, kubeadm and cni) are downloaded and started up in docker containers (this is despite having hyperkube available natively inside the image) - this is because this is how kubeadm wants to work, but having the binaries there does make the image more flexible and re-usable if you don't prefer the kubeadm route.
 
-## Building the Image
+Canal (Flannel/Calico) is installed as an addon and interfaces into the kubelet via cni.
+SkyDNS is automatically configured by kubeadm.
+The kube-dashboard is also added as an addon (more instructions later)
 
-The 'alpine-image' folder contains all the source needed to build the alpine, add docker and compile and add kubernetes.
+### The Alpine-k8s vagrant image 
+
+The job of adding the docker, kubernetes and cni binaries are taken care of wihin the build of the alpine-x.x.x-docker-x.x.x-kubenetes-vx.x.x image, which you can download from Atlas or build using the scripts in the alpine-image folder (please see the README in this folder about requirements and usage). 
+
+### Cluster token
+
+The cluster token is randomly generated in the Vagrantfile and saved to the file cluster-token.  This is so we can add nodes later to a running cluster.  You can generate a new cluster token by removing the cluster-token file.
+
+### Provisioning Scripts
+
+The shared.sh script sets up the networking and makes sure that the kubernetes kubelet is running by adding a cron job to restart it every 1 minute (this job is then removed again once everything is configured and running).
+
+The master.sh script sets up the cluster and runs kubeadm and once available it is responsible for installing our addons such as canal networking and dashboard.
+
+The minion.sh script runs the kubeadm command to join the cluster.
+
+## Present Limitations
+1. No master HA.
+2. No Ingress.
+3. No physical volumes.
+4. No authentication or quotas.
