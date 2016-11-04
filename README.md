@@ -18,7 +18,7 @@ cd alpine-k8s
 vagrant box add dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
 vagrant up
 ```
-## Extra information
+## More information
 
 ### What do we get?
 
