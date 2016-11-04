@@ -8,7 +8,7 @@ Components: -
 
 This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base running on Vagrant.  I want to make the kubernetes footprint as small and simple as possible.
 
-My aim is to set up our cluster __the easy way__ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way)).
+My aim is to set up our cluster __the easy way__ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way).
 
 I've chosen 'Docker' as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
 
