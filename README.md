@@ -8,7 +8,7 @@ Components: -
 
 This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base running on Vagrant.  I want to make the kubernetes footprint as small and simple as possible.
 
-My aim is to set up our cluster _the easy way_ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way)).
+My aim is to set up our cluster __the easy way__ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way)).
 
 I've chosen 'Docker' as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
 
@@ -16,6 +16,7 @@ I've chosen 'Docker' as the container engine over Rkt, because it is already ava
 
 ```
 git clone https://github.com/davidmccormick/alpine-k8s
+cd alpine-k8s
 vagrant box add dmcc/alpine-3.4.5-docker-1.12.3-kubernetes-v1.4.4
 vagrant up
 ```
@@ -23,11 +24,11 @@ vagrant up
 
 ### What do we get?
 
-The installation presently installs one master (master.example.com) and two minions (minion01/2.example.com).  THe installation is performed by kubeadm and so most of the kubernetes components (execept kubectl, kubelet, kubeadm and cni) are downloaded and started up in docker containers (this is despite having hyperkube available natively inside the image) - this is because this is how kubeadm wants to work, but having the binaries there does make the image more flexible and re-usable if you don't prefer the kubeadm route.
+We presently install one master (master.example.com) and two minions (minion01/2.example.com).  The installation is performed by kubeadm and so most of the kubernetes components (execept kubectl, kubelet, kubeadm and cni) are downloaded and started up in their own docker containers (this is despite having hyperkube available natively inside the image) - this is because this is how kubeadm wants to work, but having the binaries there does make the image more flexible and re-usable if you don't prefer the kubeadm route.
 
-Canal (Flannel/Calico) is installed as an addon and interfaces into the kubelet via cni.
-SkyDNS is automatically configured by kubeadm.
-The kube-dashboard is also added as an addon (more instructions later)
+*Canal (Flannel/Calico)* is installed as an addon and interfaces into the kubelet via cni.
+*SkyDNS* is automatically* configured by kubeadm.
+The *kube-dashboard* is also added (more instructions later)
 
 ### The Alpine-k8s vagrant image 
 
@@ -39,11 +40,11 @@ The cluster token is randomly generated in the Vagrantfile and saved to the file
 
 ### Provisioning Scripts
 
-The shared.sh script sets up the networking and makes sure that the kubernetes kubelet is running by adding a cron job to restart it every 1 minute (this job is then removed again once everything is configured and running).
+The *shared.sh* script sets up the networking and makes sure that the kubernetes kubelet is running by adding a cron job to restart it every 1 minute (this job is then removed again once everything is configured and running).
 
-The master.sh script sets up the cluster and runs kubeadm and once available it is responsible for installing our addons such as canal networking and dashboard.
+The *master.sh* script sets up the cluster and runs kubeadm and once available it is responsible for installing our addons such as canal networking and dashboard.
 
-The minion.sh script runs the kubeadm command to join the cluster.
+The *minion.sh* script runs the kubeadm command to join the cluster.
 
 ## Present Limitations
 1. No master HA.
