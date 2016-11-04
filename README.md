@@ -24,9 +24,9 @@ vagrant up
 
 We presently install one master (master.example.com) and two minions (minion01/2.example.com).  The installation is performed by kubeadm and so most of the kubernetes components (execept kubectl, kubelet, kubeadm and cni) are downloaded and started up in their own docker containers (this is despite having hyperkube available natively inside the image) - this is because this is how kubeadm wants to work.  Having the binaries available in the image makes it more flexible and you can easily replace my provisioning scripts with your own.
 
-**Canal (Flannel/Calico)** is installed as an addon and interfaces into the kubelet via cni.
-**SkyDNS** is automatically* configured by kubeadm.
-The **kube-dashboard** is also added (more instructions later)
+* **Canal (Flannel/Calico)** is installed as an addon and interfaces into the kubelet via cni.
+* **SkyDNS** is automatically* configured by kubeadm.
+* The **kube-dashboard** is also added (more instructions later)
 
 ### The Alpine-k8s vagrant image 
 
