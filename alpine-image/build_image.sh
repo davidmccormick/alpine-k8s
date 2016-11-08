@@ -204,18 +204,18 @@ echo -e "\n************************************************"
 echo -e "STEP 1: Kubernetes Compilation for Alpine Linux."
 echo -e "************************************************\n"
 
-KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
-mkdir -p ${KUBERNETES_BINARIES}
-export KUBERNETES_BINARIES
-
-echo -e "\nKubernetes binaries will be deployed from ${KUBERNETES_BINARIES}"
-
 if [[ ! -d "kubernetes-${KUBERNETES_VERSION#v}" ]]
 then
   echo -e "Downloading source: https://github.com/kubernetes/kubernetes/archive/${KUBERNETES_VERSION}.tar.gz"
   curl -k -L https://github.com/kubernetes/kubernetes/archive/${KUBERNETES_VERSION}.tar.gz >${KUBERNETES_VERSION}.tar.gz
   tar xfz ${KUBERNETES_VERSION}.tar.gz
 fi
+
+KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
+mkdir -p ${KUBERNETES_BINARIES}
+export KUBERNETES_BINARIES
+
+echo -e "\nKubernetes binaries will be deployed from ${KUBERNETES_BINARIES}"
 
 echo -e "\nDo we need to build our Kubernetes build container 'kubebuild:alpine'?"
 if ! docker images | grep -e "kubebuild.*alpine"
@@ -232,7 +232,8 @@ RUN adduser build -D -H -s /bin/bash -u $(id -u)
 RUN chown -R $(id -u) /usr/local/go /go
 USER $(id -u)
 EOT
-  docker build . -t kubebuild:alpine
+  echo "docker build --tag kubebuild:alpine ."
+  docker build --tag kubebuild:alpine .
 else
   echo -e "kubebuild:alpine already exists, skipping!\n"
 fi
