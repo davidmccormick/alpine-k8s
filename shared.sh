@@ -75,11 +75,6 @@ chmod +x /etc/init.d/kubelet
 rc-update add kubelet
 rc-service kubelet start
 
-echo "Adding cron check to restart kubelet.,,"
-echo "*       *       *       *       *       run-parts /etc/periodic/1min" >>/etc/crontabs/root
-mkdir -p /etc/periodic/1min
-rc-service crond restart
-
 cat >/etc/periodic/1min/kubelet <<EOT
 #!/bin/bash
 
