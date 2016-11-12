@@ -32,8 +32,8 @@ echo "Setting up canal..."
 kubectl create -f /root/canal.yaml
 # No longer need to do this because I changed canal yaml to include these annotations.
 #echo "Allowing calico policy controller and configure-canal pods to run on the master.."
-#kubectl annotate pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
-#kubectl annotate pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+kubectl annotate pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+kubectl annotate pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 echo "Installing Kubernetes Dashboard"
 #curl -k https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dashboard/dashboard-service.yaml >/root/dashboard-service.yaml
 #curl -k https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dashboard/dashboard-controller.yaml >/root/dashboard-controller.yaml
@@ -41,7 +41,7 @@ echo "Installing Kubernetes Dashboard"
 #kubectl create -f /root/dashboard-controller.yaml
 kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
 # Annotate the pod so that it will start on the master
-#kubectl annotate pod -l k8s-app=kubernetes-dashboard -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+kubectl annotate pod -l k8s-app=kubernetes-dashboard -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
