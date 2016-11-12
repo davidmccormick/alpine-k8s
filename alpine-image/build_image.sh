@@ -38,10 +38,16 @@ for i in "$@"
 do
 case $i in
     --force) FORCE="true"
+             shift
     ;;
     --atlas) ATLAS="true"
+             shift
+    ;;
+    --kubernetes=*) KUBERNETES_VERSION="${i#*=}"
+                    shift
     ;;
     --packer-logs) PACKER_LOGS="true"
+                   shift
     ;;
     *) echo -e "\noption $i unknown\n"
        exit 1
@@ -97,9 +103,11 @@ echo -n " Docker"
 DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
 
 echo -n " Kubernetes"
-KUBERNETES_VERSION=$(curl -s -k -L https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-#KUBELET_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubelet"
-#KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+if [[ -z "${KUBERNETES_VERSION}" ]]; then
+  KUBERNETES_VERSION=$(curl -s -k -L https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+  #KUBELET_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubelet"
+  #KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+fi
 
 echo -n " Kubeadm"
 KUBEADM_LATEST=$(curl -L -s https://storage.googleapis.com/kubeadm | python -c 'import sys;import xml.dom.minidom;s=sys.stdin.read();print xml.dom.minidom.parseString(s).toprettyxml()' | grep "<Key>.*amd64/kubeadm" | tail -1 | sed -e 's/^.*<Key>//' | sed -e 's/<\/Key>.*$//')

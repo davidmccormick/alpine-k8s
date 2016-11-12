@@ -29,13 +29,14 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.define :master do |master01_config|
       master01_config.vm.network "private_network", ip:"10.250.250.2", auto_config: false
+      master01_config.vm.network "forwarded_port", guest_ip: "127.0.0.1", guest: 8080, host: 8080
       # Can't use 192.168.100.1 - this is probably assigned to vagrant host as gw
       config.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]   
       end  
       master01_config.vm.provision :shell, path: "shared.sh", :privileged => true, env: {"SET_HOSTNAME" => "master.example.com"}
-      master01_config.vm.provision :file, source: "canal.yaml", destination: "~/canal.yaml"
+      #master01_config.vm.provision :file, source: "canal.yaml", destination: "~/canal.yaml"
       master01_config.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token }
   end
 

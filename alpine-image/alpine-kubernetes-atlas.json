@@ -99,7 +99,8 @@
     [{
       "type": "vagrant",
       "keep_input_artifact": false,
-      "compression_level": 9
+      "compression_level": 9,
+      "output": "alpine-{{user `alpine_version`}}-docker-{{user `docker_version`}}-kubernetes-{{user `kubernetes_version`}}.box"
     },
     {
       "type": "atlas",
