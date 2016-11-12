@@ -116,6 +116,7 @@ echo -e ""
 
 ATLAS_BOX="alpine-${ALPINE_VERSION}-docker-${DOCKER_VERSION}-kubernetes-${KUBERNETES_VERSION}"
 ATLAS_BOXES="${ATLAS_BOX}"
+BOX_SHORT="Latest Kubernetes/Docker on Alpine Linux"
 
 if [[ -d "output-virtualbox-iso" ]]; then
   echo -e "Removing existing output-virtualbox-iso"
@@ -185,7 +186,7 @@ function atlas_box_create {
   local BOX=$1
 
   echo -e "Creating atlas box ${BOX}"
-  if ! atlas_call POST https://atlas.hashicorp.com/api/v1/boxes "-d box[name]=\"${BOX}\" -d box[is_private]='false'"
+  if ! atlas_call POST https://atlas.hashicorp.com/api/v1/boxes "-d box[name]=\"${BOX}\" -d box[is_private]='false' -d box[short_description]=\"${BOX_SHORT}\""
   then
     echo -e "Sorry couldn't create the new box ${BOX}"
     return 1
