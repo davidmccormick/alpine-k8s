@@ -50,7 +50,7 @@ I've chosen **Docker** as the container engine over Rkt, because it is already a
 
 ### Dashboard
 
-The kubernetes dashboard is installed manually but from its addon manifests.  The Vagrantfile configures the local port 8080 to be forwarded to the masters 8080 so you can view it via the URL http://localhost:8080
+The kubernetes dashboard is installed manually but from its addon manifests.  The Vagrantfile configures the local port 8080 to be forwarded to the masters 8080 so you can view it via the URL http://localhost:8080/ui/
 
 ## Present Limitations
 1. No master HA.
