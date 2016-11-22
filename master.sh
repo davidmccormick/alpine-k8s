@@ -44,6 +44,13 @@ kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kube
 # Annotate the pod so that it will start on the master
 #kubectl annotate pod -l k8s-app=kubernetes-dashboard -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 
+echo "Installing Metric's collection..."
+curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/root/influxdb-service.yaml
+curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/root/influxdb-grafana-controller.yaml
+echo "Starting Grafana"
+kubectl create -f /root/influxdb-service.yaml 
+kubectl create -f /root/influxdb-grafana-controller.yaml
+
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
 
