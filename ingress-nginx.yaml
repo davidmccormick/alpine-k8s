@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
-apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: nginx-ingress-lb
+  name: nginx-ingress-controller
+  namespace: kube-system
 spec:
   template:
     metadata:
@@ -10,6 +10,8 @@ spec:
         name: nginx-ingress-lb
     spec:
       terminationGracePeriodSeconds: 60
+      nodeSelector:
+        kubeadm.alpha.kubernetes.io/role: master
       containers:
       - image: gcr.io/google_containers/nginx-ingress-controller:0.8.3
         name: nginx-ingress-lb

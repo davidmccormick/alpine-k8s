@@ -39,4 +39,4 @@ spec:
             path: /etc/traefik
           name: traefik-volume
       nodeSelector:
-        role: edge-router
+        kubeadm.alpha.kubernetes.io/role: master
