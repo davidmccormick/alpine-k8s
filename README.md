@@ -26,7 +26,7 @@ We presently install one master (master.example.com) and two minions (minion01/2
 
 * **Canal (Flannel/Calico)** is installed as an addon and interfaces into the kubelet via cni.
 * **SkyDNS** is automatically* configured by kubeadm.
-* The **kube-dashboard** is also added (more instructions later)
+* The **kube-dashboard** is also added
 
 ### The Alpine-k8s vagrant image 
 
@@ -47,6 +47,10 @@ The **minion.sh** script runs kubeadm to join the cluster.
 ### No Rkt
 
 I've chosen **Docker** as the container engine over Rkt, because it is already available for Alpine as an APK package and because it does not require systemd (which Alpine happily does not use).
+
+### Dashboard
+
+The kubernetes dashboard is installed manually but from its addon manifests.  The Vagrantfile configures the local port 8080 to be forwarded to the masters 8080 so you can view it via the URL http://localhost:8080/ui/
 
 ## Present Limitations
 1. No master HA.

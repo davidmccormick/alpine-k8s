@@ -26,8 +26,9 @@ sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${mas
 echo "Download canal setup..."
 curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/root/canal.yaml
 #cp /home/vagrant/canal.yaml /root/canal.yaml
-sed -e 's/100.78.232.136/100.64.0.2/' -i /root/canal.yaml
+sed -e 's/etcd_endpoints: "http:.*$/etcd_endpoints: "http:\/\/100.64.0.2:6666"/' -i /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
+sed -e 's/clusterIP: 10.96.232.136/clusterIP: 100.64.0.2/' -i /root/canal.yaml
 echo "Setting up canal..."
 kubectl create -f /root/canal.yaml
 # No longer need to do this because I changed canal yaml to include these annotations.
@@ -42,6 +43,13 @@ echo "Installing Kubernetes Dashboard"
 kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
 # Annotate the pod so that it will start on the master
 kubectl annotate pod -l k8s-app=kubernetes-dashboard -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+
+echo "Installing Metric's collection..."
+curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/root/influxdb-service.yaml
+curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/root/influxdb-grafana-controller.yaml
+echo "Starting Grafana"
+kubectl create -f /root/influxdb-service.yaml 
+kubectl create -f /root/influxdb-grafana-controller.yaml
 
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
