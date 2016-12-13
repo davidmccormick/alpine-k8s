@@ -7,7 +7,6 @@
       "alpine_latest_iso": "{{env `ALPINE_LATEST_ISO`}}",
       "alpine_latest_sha": "{{env `ALPINE_LATEST_SHA256`}}",
       "kubernetes_binaries": "{{env `KUBERNETES_BINARIES`}}",
-      "kubeadm_url": "{{env `KUBEADM_URL`}}",
       "atlas_user": "{{env `ATLAS_USER`}}",
       "atlas_box": "{{env `ATLAS_BOX`}}",
       "atlas_token": "{{env `ATLAS_TOKEN`}}"
@@ -17,6 +16,11 @@
       "type": "file",
       "source": "{{user `kubernetes_binaries`}}hyperkube",
       "destination": "/usr/local/bin/hyperkube"
+    },
+    {
+      "type": "file",
+      "source": "{{user `kubernetes_binaries`}}kubeadm",
+      "destination": "/usr/local/bin/kubeadm"
     },
     {
       "type": "file",
@@ -37,9 +41,6 @@
         "scripts/25kubernetes.sh",
         "scripts/90virtualbox.sh",
         "scripts/99minimize.sh"
-      ],
-      "environment_vars": [
-        "KUBEADM_URL={{user `kubeadm_url`}}"
       ],
       "override": {
         "virtualbox-iso": {
@@ -89,7 +90,7 @@
 
       "hard_drive_interface": "sata",
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "1024"],
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
         ["modifyvm", "{{.Name}}", "--cpus", "2"]
       ]
 

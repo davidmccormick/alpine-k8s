@@ -31,7 +31,7 @@ PACKER_LOGS="false"
 # Where to download the Alpine ISO and Packages from.
 ALPINE_MIRROR='dl-cdn.alpinelinux.org/alpine/'
 # Which Kubernetes components to build
-KUBERNETES_COMPONENTS="hyperkube kubectl kubelet"
+KUBERNETES_COMPONENTS="hyperkube kubectl kubelet kubeadm"
 
 # read command line args
 for i in "$@"
@@ -108,11 +108,6 @@ if [[ -z "${KUBERNETES_VERSION}" ]]; then
   #KUBELET_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubelet"
   #KUBECTL_URL="https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
 fi
-
-echo -n " Kubeadm"
-KUBEADM_LATEST=$(curl -L -s https://storage.googleapis.com/kubeadm | python -c 'import sys;import xml.dom.minidom;s=sys.stdin.read();print xml.dom.minidom.parseString(s).toprettyxml()' | grep "<Key>.*amd64/kubeadm" | tail -1 | sed -e 's/^.*<Key>//' | sed -e 's/<\/Key>.*$//')
-KUBEADM_URL="https://storage.googleapis.com/kubeadm/${KUBEADM_LATEST}"
-echo -e ""
 
 ATLAS_BOX="alpine-${ALPINE_VERSION}-docker-${DOCKER_VERSION}-kubernetes-${KUBERNETES_VERSION}"
 ATLAS_BOXES="${ATLAS_BOX}"
@@ -252,11 +247,11 @@ fi
 echo "Checking for build of cni networking..."
 if ! [[ -f "${KUBERNETES_BINARIES}/cni.tar.gz" ]]; then
   RETURN=${PWD}
-  cd kubernetes-${KUBERNETES_VERSION#v}/build/cni
+  cd kubernetes-${KUBERNETES_VERSION#v}/build-tools/cni
   sed -e 's/golang:[0-9.]*/kubebuild:alpine/' -i Makefile 
   make
   cd $RETURN 
-  cp kubernetes-${KUBERNETES_VERSION#v}/build/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
+  cp kubernetes-${KUBERNETES_VERSION#v}/build-tools/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
 else
   echo -e "Kubernetes cni binaries already built."
 fi
