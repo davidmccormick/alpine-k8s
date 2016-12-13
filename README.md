@@ -6,7 +6,7 @@ Components: -
 * Kubernetes (hyperkube, kubeadm and cni)
 * Canal (Calico/Flannel) networking
 
-This is an experimental project with the goal of creating the latest kubernetes clusters using the super small and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base running on Vagrant.  I want to make the kubernetes footprint as small and simple as possible.
+This is an experimental project with the goal of creating the latest kubernetes clusters using the super small (at 246Mb including docker and kubernetes binaries this is as small as we can hope to get) and secure [Alpine Linux](https://www.alpinelinux.org/) distribution as a base running on Vagrant.  This image is small and simple so you can test out a full kubernetes environment on your laptop without wasting gobs of disk space.
 
 My aim is to set up our cluster __the easy way__ but should this prove to be too restrictive then I'll have to consider [the hard way](https://github.com/kelseyhightower/kubernetes-the-hard-way).
 
