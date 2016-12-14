@@ -27,8 +27,6 @@ echo "Download canal setup..."
 curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/root/canal.yaml
 #cp /home/vagrant/canal.yaml /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
-sed -e 's/etcd_endpoints: "http:.*$/etcd_endpoints: "http:\/\/100.64.0.2:6666"/' -i /root/canal.yaml
-sed -e 's/clusterIP: 10.96.232.136/clusterIP: 100.64.0.2/' -i /root/canal.yaml
 
 echo "Setting up canal..."
 kubectl create -f /root/canal.yaml

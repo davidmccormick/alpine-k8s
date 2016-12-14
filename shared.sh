@@ -35,7 +35,7 @@ EOT
 /etc/init.d/networking restart
 
 echo "Route Kubernetes services network 100.64.0.0/12 via eth1 by default"
-route add -net 100.64.0.0/12 dev eth1
+route add -net 10.96.0.0/12 dev eth1
 
 mkdir -p /etc/kubernetes/manifests
 mkdir -p /etc/cni/net.d
@@ -61,7 +61,7 @@ start_pre() {
 start() {
   ebegin "Starting Kubelet"
   start-stop-daemon --background --start --exec /usr/local/bin/kubelet --make-pidfile --pidfile /run/kubelet.pid --stdout /var/log/kubelet.log --stderr /var/log/kubelet.log  \
-  -- --require-kubeconfig --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=100.64.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip} 
+  -- --require-kubeconfig --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=10.96.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=${SET_HOSTNAME} --node-ip=${my_ip} 
   eend \$?
 }
 
