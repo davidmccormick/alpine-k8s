@@ -2,11 +2,6 @@
 
 set -e
 
-# This script sets up Etcd, Flannel and Kubernetes Master
-# for a single master and 3 minions configuration.
-
-env
-
 echo "Running kubeadm init to configure kubernetes..."
 echo "MY_IP is ${MY_IP}"
 echo "cluster_token is ${KUBE_TOKEN}"
@@ -19,35 +14,10 @@ cp /etc/kubernetes/admin.conf /root/.kube/config
 
 echo "Patching the apiserver manifest to advertise the master on the right address..."
 sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${MY_IP}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
-sleep 5
-#echo "Killing to api-server so that it will re-spawn with new settings..."
-#api_container=$(docker ps | grep "apiserver" | awk '{print $1}')
-#docker stop ${api_container} 
-#docker rm ${api_container} 
 
 echo "Download canal setup..."
-curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/root/canal.yaml
-sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
-
-wait_for_api_server_available() {
-set +e
-curl --fail -s -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
-while [[ $? != 0 ]] 
-do
-	echo "Waiting for API Server to be available on https://${MY_IP}:6443"
-	sleep 5
-	curl --fail -s -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
-done
-set -e
-}
-
-echo "Setting up canal..."
-wait_for_api_server_available
-kubectl create -f /root/canal.yaml
-# No longer need to do this because I changed canal yaml to include these annotations.
-#echo "Allowing calico policy controller and configure-canal pods to run on the master.."
-kubectl annotate --overwrite pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
-kubectl annotate --overwrite pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/etc/kubernetes/manifests/canal.yaml
+sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /etc/kubernetes/manifests/canal.yaml
 
 echo "Installing Addon Manager"
 mkdir -p /etc/kubernetes/addons
