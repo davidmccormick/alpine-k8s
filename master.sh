@@ -57,7 +57,8 @@ echo "Installing Kubernetes Dashboard"
 curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml /etc/kubernetes/addons/kubernetes-dashboard.yaml
 
 echo "Installing heapster"
-curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml >/etc/kubernetes/addons/heapster.yaml
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml >/etc/kubernetes/addons/heapster-controller.yaml
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-service.yaml >/etc/kubernetes/addons/heapster-service.yaml
 #echo "Installing Metric's collection..."
 #curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/etc/kubernetes/addons/influxdb-service.yaml
 #curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/etc/kubernetes/addons/influxdb-grafana-controller.yaml
