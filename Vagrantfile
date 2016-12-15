@@ -3,6 +3,11 @@
 
 ENV['VAGRANT_DEFAULT_PROVIDER']='virtualbox'
 
+CONFIG = File.expand_path("config.rb")
+if File.exist?(CONFIG)
+  require CONFIG
+end
+
 # create a randomn cluster token or read from cluster-token if exists
 if File.exist?("cluster-token") 
   cluster_token=File.read("cluster-token")
@@ -20,7 +25,7 @@ config.ssh.insert_key = false
 #  v.functional_vboxsf     = false
 #end
 config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.box = "dmcc/alpine-3.4.6-docker-1.12.3-kubernetes-v1.5.1"
+  config.vm.box = "dmcc/alpine-3.4.6-docker-1.12.3-kubernetes-#{$kubernetes_version}"
 
   # disable vbguest updates as this does not work on alpine.
   if Vagrant.has_plugin?("vagrant-vbguest")
@@ -37,7 +42,7 @@ config.vm.synced_folder ".", "/vagrant", disabled: true
       end  
       master01_config.vm.provision :shell, path: "shared.sh", :privileged => true, env: {"SET_HOSTNAME" => "master.example.com"}
       #master01_config.vm.provision :file, source: "canal.yaml", destination: "~/canal.yaml"
-      master01_config.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token }
+      master01_config.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN" => cluster_token, "KUBERNETES_VERSION" => $kubernetes_version  }
   end
 
   config.vm.define :minion01 do |minion01_config|

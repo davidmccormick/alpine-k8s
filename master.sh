@@ -10,7 +10,7 @@ master_ip=$(cat /etc/hosts | grep $(hostname) | awk '{print $1}')
 echo "master_ip is ${master_ip}"
 echo "cluster_token is ${KUBE_TOKEN}"
 echo "Running: kubeadm init --api-advertise-addresses=${master_ip} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN}"
-kubeadm init --api-advertise-addresses=${master_ip} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN} | tee /root/kubeadm_init.log
+kubeadm init --api-advertise-addresses=${master_ip} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
 
 #copy kubeconfig for root's usage
 mkdir -p /root/.kube
@@ -28,7 +28,20 @@ curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubead
 #cp /home/vagrant/canal.yaml /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
 
+wait_for_api_server_available() {
+set +e
+curl --fail -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
+while [[ $? != 0 ]] 
+do
+	echo "Waiting for API Server to be available on https://${master_ip}:6443"
+	sleep 5
+	curl --fail -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
+done
+set -e
+}
+
 echo "Setting up canal..."
+wait_for_api_server_available
 kubectl create -f /root/canal.yaml
 # No longer need to do this because I changed canal yaml to include these annotations.
 #echo "Allowing calico policy controller and configure-canal pods to run on the master.."
