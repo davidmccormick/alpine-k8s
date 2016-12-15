@@ -51,7 +51,7 @@ kubectl annotate --overwrite pod -l k8s-app=calico-policy -n kube-system schedul
 
 echo "Installing Addon Manager"
 mkdir -p /etc/kubernetes/addons
-curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests/addon-manager.yaml
 
 echo "Installing Kubernetes Dashboard"
 curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml /etc/kubernetes/addons/kubernetes-dashboard.yaml
