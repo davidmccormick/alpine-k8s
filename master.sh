@@ -27,7 +27,6 @@ sleep 5
 
 echo "Download canal setup..."
 curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/root/canal.yaml
-#cp /home/vagrant/canal.yaml /root/canal.yaml
 sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
 
 wait_for_api_server_available() {
@@ -50,21 +49,18 @@ kubectl create -f /root/canal.yaml
 kubectl annotate --overwrite pod -l job-name=configure-canal -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 kubectl annotate --overwrite pod -l k8s-app=calico-policy -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
 
-echo "Installing Kubernetes Dashboard"
-#curl -k https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dashboard/dashboard-service.yaml >/root/dashboard-service.yaml
-#curl -k https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dashboard/dashboard-controller.yaml >/root/dashboard-controller.yaml
-#kubectl create -f /root/dashboard-service.yaml
-#kubectl create -f /root/dashboard-controller.yaml
-kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
-# Annotate the pod so that it will start on the master
-kubectl annotate --overwrite pod -l k8s-app=kubernetes-dashboard -n kube-system scheduler.alpha.kubernetes.io/tolerations='[{"key":"dedicated", "operator":"Exists"}]'
+echo "Installing Addon Manager"
+mkdir -p /etc/kubernetes/addons
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests
 
-echo "Installing Metric's collection..."
-curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/root/influxdb-service.yaml
-curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/root/influxdb-grafana-controller.yaml
-echo "Starting Grafana"
-kubectl create -f /root/influxdb-service.yaml 
-kubectl create -f /root/influxdb-grafana-controller.yaml
+echo "Installing Kubernetes Dashboard"
+curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml /etc/kubernetes/addons/kubernetes-dashboard.yaml
+
+echo "Installing heapster"
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml >/etc/kubernetes/addons/heapster.yaml
+#echo "Installing Metric's collection..."
+#curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/etc/kubernetes/addons/influxdb-service.yaml
+#curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/etc/kubernetes/addons/influxdb-grafana-controller.yaml
 
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
