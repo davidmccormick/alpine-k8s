@@ -24,7 +24,7 @@ mkdir -p /etc/kubernetes/addons
 curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests/addon-manager.yaml
 
 echo "Installing Kubernetes Dashboard"
-curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml /etc/kubernetes/addons/kubernetes-dashboard.yaml
+curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml >/etc/kubernetes/addons/kubernetes-dashboard.yaml
 
 echo "Installing heapster"
 curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml >/etc/kubernetes/addons/heapster-controller.yaml
