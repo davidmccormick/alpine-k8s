@@ -5,19 +5,21 @@ set -e
 # This script sets up Etcd, Flannel and Kubernetes Master
 # for a single master and 3 minions configuration.
 
+env
+
 echo "Running kubeadm init to configure kubernetes..."
-master_ip=$(cat /etc/hosts | grep $(hostname) | awk '{print $1}')
-echo "master_ip is ${master_ip}"
+echo "MY_IP is ${MY_IP}"
 echo "cluster_token is ${KUBE_TOKEN}"
-echo "Running: kubeadm init --api-advertise-addresses=${master_ip} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN}"
-kubeadm init --api-advertise-addresses=${master_ip} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
+echo "Running: kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN}"
+kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
 
 #copy kubeconfig for root's usage
 mkdir -p /root/.kube
 cp /etc/kubernetes/admin.conf /root/.kube/config
 
 echo "Patching the apiserver manifest to advertise the master on the right address..."
-sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${master_ip}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
+sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${MY_IP}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
+sleep 5
 #echo "Killing to api-server so that it will re-spawn with new settings..."
 #api_container=$(docker ps | grep "apiserver" | awk '{print $1}')
 #docker stop ${api_container} 
@@ -30,12 +32,12 @@ sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /root/canal.yaml
 
 wait_for_api_server_available() {
 set +e
-curl --fail -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
+curl --fail -s -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
 while [[ $? != 0 ]] 
 do
-	echo "Waiting for API Server to be available on https://${master_ip}:6443"
+	echo "Waiting for API Server to be available on https://${MY_IP}:6443"
 	sleep 5
-	curl --fail -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
+	curl --fail -s -k -L --cacert /etc/kubernetes/pki/ca.pem --cert /etc/kubernetes/pki/apiserver.pem --key /etc/kubernetes/pki/apiserver-key.pem https://10.250.250.2:6443/api/v1
 done
 set -e
 }

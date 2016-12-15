@@ -7,8 +7,8 @@ set -e
 
 echo "Running kubeadm join to configure kubernetes..."
 echo "cluster_token is ${KUBE_TOKEN}"
-echo kubeadm join --token "${KUBE_TOKEN}" $(cat /etc/hosts | grep master | awk '{print $1}')
-kubeadm join --token "${KUBE_TOKEN}" $(cat /etc/hosts | grep master | awk '{print $1}')
+echo kubeadm join --token "${KUBE_TOKEN}" ${MASTER_LB_IP}
+kubeadm join --token "${KUBE_TOKEN}" ${MASTER_LB_IP}
 
 #copy kubeconfig for root's usage
 mkdir -p /root/.kube
