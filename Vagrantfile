@@ -40,7 +40,7 @@ config.ssh.insert_key = false
 #  v.functional_vboxsf     = false
 #end
 config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.box = "dmcc/alpine-3.4.6-docker-1.12.3-kubernetes-#{$kubernetes_version}"
+config.vm.box = "dmcc/alpine-3.5.0-docker-1.12.3-kubernetes-#{$kubernetes_version}"
 
   # disable vbguest updates as this does not work on alpine.
   if Vagrant.has_plugin?("vagrant-vbguest")

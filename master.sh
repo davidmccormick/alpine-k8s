@@ -2,6 +2,65 @@
 
 set -e
 
+add_cluster_service_label() {
+	local MANIFEST=$1
+
+	# make sure has the kubernetes.io/cluster-service: 'true' label for addon manager to pick up
+	if ! grep -q "    kubernetes.io/cluster-service" /etc/kubernetes/addons/${MANIFEST}; then
+		sed -e 's/^  labels:/  labels:\n    kubernetes.io\/cluster-service: "true"/' -i /etc/kubernetes/addons/${MANIFEST}
+	fi
+	if ! grep -q "  labels:" /etc/kubernetes/addons/${MANIFEST}; then
+		sed -e 's/^metadata:/metadata:\n  labels:\n    kubernetes.io\/cluster-service: "true"/' -i /etc/kubernetes/addons/${MANIFEST}
+	fi
+}
+
+install_addon() {
+	local URL=$1
+	local MANIFEST=$2
+
+	curl -k -L -s ${URL} >/etc/kubernetes/addons/${MANIFEST}
+	#separate multiple objects in one 1 file into multiple manifests
+	if grep -q "^---" /etc/kubernetes/addons/${MANIFEST}; then
+		local NUM_OBJECTS=$(cat /etc/kubernetes/addons/${MANIFEST}  | grep "^---" | wc -l)
+
+		# loop over the objects creating separate files file1.yaml file2.yaml
+		local l=0
+		while [ $l -le $NUM_OBJECTS ]
+		do  
+			local NEW_NAME=${MANIFEST/%.yaml/$l.yaml}
+			echo "Creating new manifest ${NEW_NAME}" 
+			cat /etc/kubernetes/addons/${MANIFEST} | awk 'BEGIN{count=0} ($0 ~ /^---/){count++;next} ( count == '$l' ){print}' >/etc/kubernetes/addons/${NEW_NAME}
+			add_cluster_service_label "${NEW_NAME}"
+			l=$((l+=1))
+		done
+		rm -f /etc/kubernetes/addons/${MANIFEST}
+	else
+		add_cluster_service_label /etc/kubernetes/addons/${MANIFEST}
+	fi
+}
+
+echo "Preparing Addons..."
+mkdir -p /etc/kubernetes/addons
+
+echo "Preparing canal as addon"
+install_addon https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml canal.yaml
+# change the interface to eth1
+sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /etc/kubernetes/addons/canal0.yaml
+
+echo "Preparing Kubernetes Dashboard as addon"
+install_addon https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml kubernetes-dashboard.yaml
+
+echo "Preparing Heapster, InfluxDB and Grafana as addons"
+for MANIFEST in heapster-deployment.yaml heapster-service.yaml grafana-deployment.yaml grafana-service.yaml influxdb-deployment.yaml influxdb-service.yaml
+do
+  install_addon "https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/${MANIFEST}" "${MANIFEST}"
+done
+
+# Install the addon manager as a direct kubelet manifest
+echo "Installing Addon Manager - to install/manage addons"
+curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests/addon-manager.yaml
+
+# Actually install the cluster with kubeadm
 echo "Running kubeadm init to configure kubernetes..."
 echo "MY_IP is ${MY_IP}"
 echo "cluster_token is ${KUBE_TOKEN}"
@@ -14,24 +73,6 @@ cp /etc/kubernetes/admin.conf /root/.kube/config
 
 echo "Patching the apiserver manifest to advertise the master on the right address..."
 sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${MY_IP}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
-
-echo "Download canal setup..."
-curl -k https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml >/etc/kubernetes/manifests/canal.yaml
-sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /etc/kubernetes/manifests/canal.yaml
-
-echo "Installing Addon Manager"
-mkdir -p /etc/kubernetes/addons
-curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests/addon-manager.yaml
-
-echo "Installing Kubernetes Dashboard"
-curl -L -k https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml >/etc/kubernetes/addons/kubernetes-dashboard.yaml
-
-echo "Installing heapster"
-curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml >/etc/kubernetes/addons/heapster-controller.yaml
-curl -k -L -s https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-service.yaml >/etc/kubernetes/addons/heapster-service.yaml
-#echo "Installing Metric's collection..."
-#curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-service.yaml >/etc/kubernetes/addons/influxdb-service.yaml
-#curl -k -L https://github.com/kubernetes/kubernetes/raw/master/cluster/addons/cluster-monitoring/influxdb/influxdb-grafana-controller.yaml >/etc/kubernetes/addons/influxdb-grafana-controller.yaml
 
 # Remove kubelet restarter
 [[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
