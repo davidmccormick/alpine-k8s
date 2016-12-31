@@ -4,14 +4,13 @@ source /etc/os-release
 
 cat << EOF > /etc/motd
 
-$PRETTY_NAME ($VERSION_ID) Development Environment
+$PRETTY_NAME ($VERSION_ID) 
+$HOME_URL
 
-Built for use with Vagrant using:
-   <https://github.com/maier/packer-templates>
+with Docker ($DOCKER_VERSION)
+and Kubernetes ($KUBERNETES_VERSION)
 
-See the Alpine Wiki for how-to guides and
-general information about administrating
-Alpine systems and development.
-See <http://wiki.alpinelinux.org>
+See build and usage instructions at:
+  <https://github.com/davidmccormick/alpine-k8s>
 
 EOF
