@@ -39,6 +39,10 @@
         "scripts/90virtualbox.sh",
         "scripts/99minimize.sh"
       ],
+      "environment_vars": [
+        "DOCKER_VERSION={{user `docker_version`}}",
+        "KUBERNETES_VERSION={{user `kubernetes_version`}}"
+      ],
       "override": {
         "virtualbox-iso": {
           "execute_command": "/bin/sh -c '{{ .Vars }} {{ .Path }}'"

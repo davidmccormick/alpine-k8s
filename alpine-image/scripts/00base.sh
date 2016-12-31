@@ -1,12 +1,15 @@
 set -ux
 
+echo "Environment is:-"
+env
+
 source /etc/os-release
 
 cat << EOF > /etc/motd
 
-$PRETTY_NAME ($VERSION_ID) 
-$HOME_URL
+apline-k8s
 
+$PRETTY_NAME ($VERSION_ID) 
 with Docker ($DOCKER_VERSION)
 and Kubernetes ($KUBERNETES_VERSION)
 
