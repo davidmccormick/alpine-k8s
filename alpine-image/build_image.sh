@@ -29,7 +29,7 @@ ATLAS="false"
 PACKER_LOGS="false"
 
 # Where to download the Alpine ISO and Packages from.
-ALPINE_MIRROR='dl-cdn.alpinelinux.org/alpine/'
+ALPINE_MIRROR='dl-cdn.alpinelinux.org'
 # Which Kubernetes components to build
 KUBERNETES_COMPONENTS="hyperkube kubectl kubelet kubeadm"
 
@@ -94,10 +94,20 @@ fi
 echo -n "Determining latest versions of components: "
 echo -n "Alpine"
 # builds the latest alpine
-ALPINE_LATEST_ISO="http://${ALPINE_MIRROR}/$(curl -k -s  http://${ALPINE_MIRROR}/.latest.x86_64.txt | grep 'alpine-extended' | head -1 | awk '{print $3}')"
-ALPINE_LATEST_SHA256=$(curl -k -s  http://${ALPINE_MIRROR}/.latest.x86_64.txt | grep 'alpine-extended' | head -1 | awk '{print $6}')
-ALPINE_VERSION="${ALPINE_LATEST_ISO%-x86_64.iso*}"
+ALPINE_SHORT_ISO="$(curl -s -L http://${ALPINE_MIRROR}/alpine/latest-stable/releases/x86_64/latest-releases.yaml | grep alpine-extended | grep iso: | awk '{print $2}')"
+echo "$(curl -s -L http://${ALPINE_MIRROR}/alpine/latest-stable/releases/x86_64/latest-releases.yaml | grep alpine-extended | grep iso: | awk '{print $2}')"
+ALPINE_LATEST_ISO="http://${ALPINE_MIRROR}/alpine/latest-stable/releases/x86_64/${ALPINE_SHORT_ISO}"
+ALPINE_LATEST_SHA256="${ALPINE_LATEST_ISO}.sha256"
+ALPINE_VERSION="${ALPINE_SHORT_ISO%-x86_64.iso*}"
 ALPINE_VERSION="${ALPINE_VERSION##*-}"
+
+# debug ALPINE VERSION LOOKUP
+#echo ""
+#echo "ALPINE_MIRROR: ${ALPINE_MIRROR}"
+#echo "ALPINE_SHORT_ISO: ${ALPINE_SHORT_ISO}"
+#echo "ALPINE_LATEST_ISO: ${ALPINE_LATEST_ISO}"
+#echo "ALPINE_LATEST_SHA256: ${ALPINE_LATEST_SHA256}"
+#echo "ALPINE_VERSION: ${ALPINE_VERSION}"
 
 echo -n " Docker"
 DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
