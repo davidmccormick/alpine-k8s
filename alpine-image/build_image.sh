@@ -101,13 +101,13 @@ ALPINE_VERSION="${ALPINE_SHORT_ISO%-x86_64.iso*}"
 ALPINE_VERSION="${ALPINE_VERSION##*-}"
 
 # debug ALPINE VERSION LOOKUP
-echo ""
-echo "ALPINE_MIRROR: ${ALPINE_MIRROR}"
-echo "ALPINE_SHORT_ISO: ${ALPINE_SHORT_ISO}"
-echo "ALPINE_LATEST_ISO: ${ALPINE_LATEST_ISO}"
-echo "ALPINE_LATEST_SHA256: ${ALPINE_LATEST_SHA256}"
-echo "ALPINE_VERSION: ${ALPINE_VERSION}"
-echo ""
+#echo ""
+#echo "ALPINE_MIRROR: ${ALPINE_MIRROR}"
+#echo "ALPINE_SHORT_ISO: ${ALPINE_SHORT_ISO}"
+#echo "ALPINE_LATEST_ISO: ${ALPINE_LATEST_ISO}"
+#echo "ALPINE_LATEST_SHA256: ${ALPINE_LATEST_SHA256}"
+#echo "ALPINE_VERSION: ${ALPINE_VERSION}"
+#echo ""
 
 echo -n " Docker"
 DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
