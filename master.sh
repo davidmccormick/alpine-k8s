@@ -6,10 +6,10 @@ add_cluster_service_label() {
 	local MANIFEST=$1
 
 	# make sure has the kubernetes.io/cluster-service: 'true' label for addon manager to pick up
-	if ! grep -q "    kubernetes.io/cluster-service" /etc/kubernetes/addons/${MANIFEST}; then
+	if ! grep -q "^    kubernetes.io/cluster-service" /etc/kubernetes/addons/${MANIFEST}; then
 		sed -e 's/^  labels:/  labels:\n    kubernetes.io\/cluster-service: "true"/' -i /etc/kubernetes/addons/${MANIFEST}
 	fi
-	if ! grep -q "  labels:" /etc/kubernetes/addons/${MANIFEST}; then
+	if ! grep -q "^  labels:" /etc/kubernetes/addons/${MANIFEST}; then
 		sed -e 's/^metadata:/metadata:\n  labels:\n    kubernetes.io\/cluster-service: "true"/' -i /etc/kubernetes/addons/${MANIFEST}
 	fi
 }
