@@ -44,8 +44,8 @@ install_addon() {
 echo "Running kubeadm init to configure kubernetes..."
 echo "MY_IP is ${MY_IP}"
 echo "cluster_token is ${KUBE_TOKEN}"
-echo "Running: kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN}"
-kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=master.example.com --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
+echo "Running: kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=$(hostname) --token=${KUBE_TOKEN}"
+kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=$(hostname) --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
 
 #copy kubeconfig for root's usage
 mkdir -p /root/.kube
