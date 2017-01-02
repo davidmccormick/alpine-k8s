@@ -10,6 +10,6 @@ EOT
 echo "Performing an update/upgrade"
 apk update
 apk upgrade
-apk add bash bash-completion util-linux pciutils usbutils coreutils binutils findutils grep awk sed lsof
+apk add bash bash-completion util-linux pciutils usbutils coreutils binutils findutils grep gawk sed lsof
 
 exit 0
