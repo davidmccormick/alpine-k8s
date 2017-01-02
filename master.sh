@@ -2,6 +2,10 @@
 
 set -e
 
+# These are hardcoded in the kubelet start up script.
+CLUSTER_DNS="10.96.0.10"
+CLUSTER_DOMAIN="cluster.local"
+
 add_cluster_service_label() {
 	local MANIFEST=$1
 
@@ -56,6 +60,12 @@ sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${MY_
 
 echo "Preparing Addons..."
 mkdir -p /etc/kubernetes/addons
+
+echo "Preparing SkyDNS as addon"
+install_addon https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kubedns-controller.yaml.sed kubedns-controller.yaml
+sed -e 's/\$DNS_DOMAIN\.?/'${CLUSTER_DOMAIN}'/g' -i /etc/kubernetes/addons/kubedns-controller.yaml
+install_addon https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kubedns-svc.yaml.sed kubedns-svc.yaml
+sed -e 's/\$DNS_SERVER/'${CLUSTER_DNS}'/g' -i /etc/kubernetes/addons/kubedns-svc.yaml
 
 echo "Preparing canal as addon"
 install_addon https://raw.githubusercontent.com/tigera/canal/master/k8s-install/kubeadm/canal.yaml canal.yaml
