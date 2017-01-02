@@ -23,3 +23,6 @@ curl -sSo /home/vagrant/.ssh/authorized_keys 'https://raw.githubusercontent.com/
 
 chown -R vagrant:vagrant /home/vagrant/.ssh
 chmod -R go-rwsx /home/vagrant/.ssh
+
+echo "Use the bash shell for vagrant and root"
+sed -e 's@/bin/ash@/bin/bash@' -i /etc/passwd

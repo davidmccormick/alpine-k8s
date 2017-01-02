@@ -1,7 +1,7 @@
 set -eux
 
 echo "Installing Kubeadm dependencies..."
-apk add ebtables ethtool socat iproute2
+apk add ebtables ethtool socat iproute2 iptables
 
 echo "Downloading Kubernetes Binaries from local http server"
 echo ""
