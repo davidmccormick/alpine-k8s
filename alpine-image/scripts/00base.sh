@@ -7,11 +7,11 @@ source /etc/os-release
 
 cat << EOF > /etc/motd
 
-apline-k8s
+alpine-k8s / Kubernetes Server
 
-$PRETTY_NAME ($VERSION_ID) 
-with Docker ($DOCKER_VERSION)
-and Kubernetes ($KUBERNETES_VERSION)
+$PRETTY_NAME: $VERSION_ID
+Docker: $DOCKER_VERSION
+Kubernetes: $KUBERNETES_VERSION
 
 See build and usage instructions at:
   <https://github.com/davidmccormick/alpine-k8s>
