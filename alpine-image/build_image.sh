@@ -257,11 +257,11 @@ fi
 echo "Checking for build of cni networking..."
 if ! [[ -f "${KUBERNETES_BINARIES}/cni.tar.gz" ]]; then
   RETURN=${PWD}
-  cd kubernetes-${KUBERNETES_VERSION#v}/build-tools/cni
+  cd kubernetes-${KUBERNETES_VERSION#v}/build/cni
   sed -e 's/golang:[0-9.]*/kubebuild:alpine/' -i Makefile 
   make
   cd $RETURN 
-  cp kubernetes-${KUBERNETES_VERSION#v}/build-tools/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
+  cp kubernetes-${KUBERNETES_VERSION#v}/build/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
 else
   echo -e "Kubernetes cni binaries already built."
 fi
