@@ -6,6 +6,36 @@ set -e
 CLUSTER_DNS="10.96.0.10"
 CLUSTER_DOMAIN="cluster.local"
 
+## Add kubeadm config and KUBE_HYPERKUBE_IMAGE	``
+# etcd endpoints in the form... scheme://ip:port
+# apiVersion: kubeadm.k8s.io/v1alpha1
+# kind: MasterConfiguration
+# api:
+#   advertiseAddresses:
+#   - <address1|string>
+#   - <address2|string>
+#   bindPort: <int>
+#   externalDNSNames:
+#   - <dnsname1|string>
+#   - <dnsname2|string>
+# cloudProvider: <string>
+# discovery:
+#   bindPort: <int>
+# etcd:
+#   endpoints:
+#   - <endpoint1|string>
+#   - <endpoint2|string>
+#   caFile: <path|string>
+#   certFile: <path|string>
+#   keyFile: <path|string>
+# kubernetesVersion: <string>
+# networking:
+#   dnsDomain: <string>
+#   serviceSubnet: <cidr>
+#   podSubnet: <cidr>
+# secrets:
+#   givenToken: <token|string>
+
 add_cluster_service_label() {
 	local MANIFEST=$1
 
