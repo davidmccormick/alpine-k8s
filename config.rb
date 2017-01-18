@@ -1,4 +1,4 @@
-$kubernetes_version="v1.5.1"
+$kubernetes_version="v1.5.2"
 
 $master_count=1
 $master_memory=2048
