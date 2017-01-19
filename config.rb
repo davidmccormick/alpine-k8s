@@ -1,7 +1,7 @@
 $kubernetes_version="v1.5.2"
 
 $etcd_count=1
-$etcd_memory=512
+$etcd_memory=768
 $etcd_cpu=2
 
 $master_count=1

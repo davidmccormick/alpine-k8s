@@ -87,7 +87,7 @@ api:
   - $(hostname)
 etcd:
   endpoints:
-$(for ep in ${ETCD_ENDPOINTS}; do echo -e "  - ${ep}\n"; done)
+$(for ep in ${ETCD_ENDPOINTS}; do echo -e "  - ${ep}"; done)
 kubernetesVersion: ${KUBERNETES_VERSION} 
 secrets:
   givenToken: ${KUBE_TOKEN}
