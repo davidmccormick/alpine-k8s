@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 ENV['VAGRANT_DEFAULT_PROVIDER']='virtualbox'
-MASTER_LB_IP="10.250.250.2" # Load balanced VIP/IP for the master API
+MASTER_LB_IP="10.250.250.11" # Load balanced VIP/IP for the master API
 
 # Defaults
 $etcd_cpu=1
@@ -43,6 +43,7 @@ end
 etcdIPs = [*1..$etcd_count].map{ |i| etcdIP(i) }
 initial_etcd_cluster = etcdIPs.map.with_index{ |ip, i| "etcd#{i+1}=http://#{ip}:2380" }.join(",")
 etcd_endpoints = etcdIPs.map.with_index{ |ip, i| "http://#{ip}:2379" }.join(",")
+etcd_spaced_endpoints = etcdIPs.map.with_index{ |ip, i| "http://#{ip}:2379" }.join(" ")
 
 Vagrant.configure(2) do |config|
 config.ssh.insert_key = false
@@ -87,8 +88,7 @@ config.vm.box = "dmcc/alpine-3.5.0-docker-1.12.6-kubernetes-#{$kubernetes_versio
       master.vm.network "forwarded_port", guest_ip: "127.0.0.1", guest: 8080, host: 8080
 
       master.vm.provision :shell, path: "shared.sh", :privileged => true, env: { "SET_HOSTNAME": "master#{i}.example.com", "MY_IP": masterIP }
-      master.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN": cluster_token, "KUBERNETES_VERSION": $kubernetes_version,
-	 "MY_IP": masterIP, "MASTER_LB_IP": MASTER_LB_IP }
+      master.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN": cluster_token, "KUBERNETES_VERSION": $kubernetes_version, "ETCD_ENDPOINTS": etcd_spaced_endpoints, "MY_IP": masterIP, "MASTER_LB_IP": MASTER_LB_IP }
     end
   end
 

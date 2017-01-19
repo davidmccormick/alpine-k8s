@@ -75,11 +75,34 @@ install_addon() {
 }
 
 # install the cluster with kubeadm
+mkdir -p /etc/kubernetes
+cat <<EOT >/etc/kubernetes/kubeadm.conf
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddresses:
+  - ${MY_IP}
+  bindPort: 6443
+  externalDNSNames:
+  - $(hostname)
+etcd:
+  endpoints:
+$(for ep in ${ETCD_ENDPOINTS}; do echo -e "  - ${ep}\n"; done)
+kubernetesVersion: ${KUBERNETES_VERSION} 
+secrets:
+  givenToken: ${KUBE_TOKEN}
+EOT
+
 echo "Running kubeadm init to configure kubernetes..."
+export KUBE_HYPERKUBE_IMAGE="gcr.io/google_containers/hyperkube:${KUBERNETES_VERSION}"
 echo "MY_IP is ${MY_IP}"
 echo "cluster_token is ${KUBE_TOKEN}"
-echo "Running: kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=$(hostname) --token=${KUBE_TOKEN}"
-kubeadm init --api-advertise-addresses=${MY_IP} --api-external-dns-names=$(hostname) --token=${KUBE_TOKEN} --use-kubernetes-version ${KUBERNETES_VERSION} | tee /root/kubeadm_init.log
+echo ""
+echo "Kubeadm settings: -"
+cat /etc/kubernetes/kubeadm.conf
+echo ""
+echo "Running: kubeadm"
+kubeadm init --config /etc/kubernetes/kubeadm.conf | tee /root/kubeadm_init.log
 
 #copy kubeconfig for root's usage
 mkdir -p /root/.kube
