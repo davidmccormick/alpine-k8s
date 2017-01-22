@@ -110,7 +110,7 @@ ALPINE_VERSION="${ALPINE_VERSION##*-}"
 #echo ""
 
 echo -n " Docker"
-DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
+DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | tail -1 | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
 
 echo -n " Kubernetes"
 if [[ -z "${KUBERNETES_VERSION}" ]]; then
