@@ -85,7 +85,6 @@ config.vm.box = "dmcc/alpine-3.5.0-docker-1.13.0-kubernetes-#{$kubernetes_versio
 
       masterIP = masterIP(i)
       master.vm.network :private_network, ip: masterIP, auto_config: false
-      master.vm.network "forwarded_port", guest_ip: "127.0.0.1", guest: 8080, host: 8080
 
       master.vm.provision :shell, path: "shared.sh", :privileged => true, env: { "SET_HOSTNAME": "master#{i}.example.com", "MY_IP": masterIP }
       master.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN": cluster_token, "KUBERNETES_VERSION": $kubernetes_version, "ETCD_ENDPOINTS": etcd_spaced_endpoints, "MY_IP": masterIP, "MASTER_LB_IP": MASTER_LB_IP }
