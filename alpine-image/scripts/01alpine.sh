@@ -4,6 +4,7 @@ echo "Setting up remote repositories..."
 cat >/etc/apk/repositories <<EOT
 http://liskamm.alpinelinux.uk/edge/main/
 http://liskamm.alpinelinux.uk/edge/community/
+http://liskamm.alpinelinux.uk/edge/testing/
 EOT
 
 echo "Performing an update/upgrade"
