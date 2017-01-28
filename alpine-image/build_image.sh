@@ -146,6 +146,9 @@ if [[ "${ATLAS}" == "true" ]]; then
   echo -e "ATLAS_TOKEN: ${ATLAS_TOKEN}"
   echo -e "ATLAS_BOXES  : ${ATLAS_BOXES}\n"
 fi
+if [[ "${AWS}" == "true" ]]; then
+ echo -e "\nAWS Build" 
+fi
 
 export ALPINE_VERSION DOCKER_VERSION KUBERNETES_VERSION ALPINE_LATEST_ISO ALPINE_LATEST_SHA256 KUBELET_URL KUBECTL_URL KUBEADM_URL
 
@@ -286,7 +289,7 @@ echo -e "STEP 2: Alpine Linux-Docker-Kubernetes Vagrant Box Build"
 echo -e "********************************************************\n"
 
 # Which packer template are we going to use - with or without atlas upload?
-if [[ "AWS" == "true" ]]; then
+if [[ "${AWS}" == "true" ]]; then
   PACKER_TEMPLATE="alpine-kubernetes-aws.json"
 elif [[ "${ATLAS}" == "true" ]]; then
   PACKER_TEMPLATE="alpine-kubernetes-atlas.json"
