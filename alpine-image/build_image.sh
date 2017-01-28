@@ -26,6 +26,7 @@ set -e
 
 FORCE="false"
 ATLAS="false"
+AWS="false"
 PACKER_LOGS="false"
 
 # Where to download the Alpine ISO and Packages from.
@@ -41,6 +42,9 @@ case $i in
              shift
     ;;
     --atlas) ATLAS="true"
+             shift
+    ;;
+    --aws) AWS="true"
              shift
     ;;
     --kubernetes=*) KUBERNETES_VERSION="${i#*=}"
@@ -282,7 +286,9 @@ echo -e "STEP 2: Alpine Linux-Docker-Kubernetes Vagrant Box Build"
 echo -e "********************************************************\n"
 
 # Which packer template are we going to use - with or without atlas upload?
-if [[ "${ATLAS}" == "true" ]]; then
+if [[ "AWS" == "true" ]]; then
+  PACKER_TEMPLATE="alpine-kubernetes-aws.json"
+elif [[ "${ATLAS}" == "true" ]]; then
   PACKER_TEMPLATE="alpine-kubernetes-atlas.json"
 else
   PACKER_TEMPLATE="alpine-kubernetes.json"
