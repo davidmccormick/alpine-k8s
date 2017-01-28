@@ -9,7 +9,7 @@ EOT
 echo "Performing an update/upgrade"
 apk update
 apk upgrade
-apk add bash bash-completion util-linux pciutils usbutils coreutils binutils findutils grep gawk sed lsof
+apk add bash bash-completion util-linux pciutils usbutils coreutils findutils grep gawk sed lsof
 
 echo "Setting systctl kernel setting to relax security"
 cat >/etc/sysctl.d/00-alpine.conf <<EOT
