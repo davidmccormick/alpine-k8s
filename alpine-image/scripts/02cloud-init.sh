@@ -2,36 +2,82 @@
 
 apk add python cloud-init tzdata
 
-echo "Configuring cloud-init service"
-cat >/etc/init.d/cloud-init <<EOT
-#!/sbin/openrc-run 
-# Copyright 1999-2013 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# \$Header: \$
+cat >/etc/cloud/cloud.cfg <<EOT
+# The top level settings are used as module
+# and system configuration.
 
-depend() {
-  need net
-  need sysfs
-}
+# A set of users which may be applied and/or used by various modules
+# when a 'default' entry is found it will reference the 'default_user'
+# from the distro configuration specified below
+users:
+   - default
 
-start_pre() {
-  ulimit -n 1048576
-  return 0
-}
+# If this is set, 'root' will not be able to ssh in and they 
+# will get a message to login instead as the above \$user (ubuntu)
+disable_root: false
+ssh_pwauth:   false
 
-start() {
-  ebegin "Starting cloud-init"
-  cloud-init init
-  cloud-init modules
-  eend \$?
-}
+# This will cause the set+update hostname module to not operate (if true)
+# preserve_hostname: false
 
-stop() {
-   ebegin "Stopping cloud-init"
-   echo "nothing to do"
-   eend 0
-}
+syslog_fix_perms: root:root
+
+ssh_deletekeys: false
+
+cloud_init_modules:
+ - seed_random
+ - bootcmd
+ - write-files
+ - growpart
+ - resizefs
+ - set_hostname
+ - update_hostname
+ - update_etc_hosts
+ - ca-certs
+ - users-groups
+ - ssh
+
+cloud_config_modules:
+ - disk_setup
+ - mounts
+ - ssh-import-id
+ - set-passwords
+ - timezone
+ - puppet
+ - chef
+ - salt-minion
+ - mcollective
+ - disable-ec2-metadata
+ - runcmd
+
+cloud_final_modules:
+ - scripts-vendor
+ - scripts-per-once
+ - scripts-per-boot
+ - scripts-per-instance
+ - scripts-user
+ - ssh-authkey-fingerprints
+ - keys-to-console
+ - phone-home
+ - final-message
+ - power-state-change
+
+# System and/or distro specific settings
+# (not accessible to handlers/transforms)
+system_info:
+   # This will affect which distro class gets used
+   distro: alpine
+   # Default user name + that default users groups (if added/used)
+   default_user:
+     name: alpine
+     gecos: Alpine
+     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+     shell: /bin/bash
+     lock_passwd: false
+   # Other config here will be given to the distro class and/or path classes
+   paths:
+      cloud_dir: /var/lib/cloud/
+      templates_dir: /etc/cloud/templates/
 EOT
 
-rc-update add cloud-init
 
