@@ -30,7 +30,7 @@
         "scripts/00base.sh",
         "scripts/01alpine.sh",
         "scripts/01networking.sh",
-        "scripts/01cloud-init.sh",
+        "scripts/02cloud-init.sh",
         "scripts/02sshd.sh",
         "scripts/03vagrant.sh",
         "scripts/04sudoers.sh",
