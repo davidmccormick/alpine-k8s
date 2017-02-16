@@ -21,8 +21,8 @@ end
 if File.exist?("cluster-token") 
   cluster_token=File.read("cluster-token")
 else
-  t1=`cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 6 | head -n 1`.chomp
-  t2=`cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 16 | head -n 1`.chomp
+  t1=`cat /dev/urandom | LC_CTYPE=C tr -dc 'a-f0-9' | fold -w 6 | head -n 1`.chomp
+  t2=`cat /dev/urandom | LC_CTYPE=C tr -dc 'a-f0-9' | fold -w 16 | head -n 1`.chomp
   cluster_token="#{t1}.#{t2}"
   File.write("cluster-token", cluster_token)
 end
