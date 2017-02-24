@@ -52,7 +52,7 @@ config.ssh.insert_key = false
 #  v.functional_vboxsf     = false
 #end
 config.vm.synced_folder ".", "/vagrant", disabled: true
-config.vm.box = "dmcc/alpine-3.5.1-docker-1.13.0-kubernetes-#{$kubernetes_version}"
+config.vm.box = "dmcc/alpine-3.5.1-docker-1.13.1-kubernetes-#{$kubernetes_version}"
 
   # disable vbguest updates as this does not work on alpine.
   if Vagrant.has_plugin?("vagrant-vbguest")
@@ -86,7 +86,7 @@ config.vm.box = "dmcc/alpine-3.5.1-docker-1.13.0-kubernetes-#{$kubernetes_versio
       masterIP = masterIP(i)
       master.vm.network :private_network, ip: masterIP, auto_config: false
 
-      master.vm.provision :shell, path: "shared.sh", :privileged => true, env: { "SET_HOSTNAME": "master#{i}.example.com", "MY_IP": masterIP }
+      master.vm.provision :shell, path: "shared.sh", :privileged => true, env: { "SET_HOSTNAME": "master#{i}.example.com", "MY_IP": masterIP, "MASTER_COUNT": $master_count, "MY_NUMBER": $i }
       master.vm.provision :shell, path: "master.sh", :privileged => true, env: { "KUBE_TOKEN": cluster_token, "KUBERNETES_VERSION": $kubernetes_version, "ETCD_ENDPOINTS": etcd_spaced_endpoints, "MY_IP": masterIP, "MASTER_LB_IP": MASTER_LB_IP }
     end
   end

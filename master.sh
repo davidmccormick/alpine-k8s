@@ -110,6 +110,8 @@ cp /etc/kubernetes/admin.conf /root/.kube/config
 
 echo "Patching the apiserver manifest to advertise the master on the right address..."
 sed -e 's/"--allow-privileged",/"--allow-privileged","--advertise-address='${MY_IP}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
+echo "Set the right number of master servers..."
+sed -e 's/"--v=2",/"--v=2", "--apiserver-count='${MASTER_COUNT}'",/' -i /etc/kubernetes/manifests/kube-apiserver.json
 
 echo "Preparing Addons..."
 mkdir -p /etc/kubernetes/addons
@@ -128,11 +130,17 @@ sed -e 's/canal_iface: ""/canal_iface: "eth1"/' -i /etc/kubernetes/addons/canal0
 echo "Preparing Kubernetes Dashboard as addon"
 install_addon https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml kubernetes-dashboard.yaml
 
-echo "Preparing Heapster, InfluxDB and Grafana as addons"
-for MANIFEST in heapster-deployment.yaml heapster-service.yaml grafana-deployment.yaml grafana-service.yaml influxdb-deployment.yaml influxdb-service.yaml
-do
-  install_addon "https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/${MANIFEST}" "${MANIFEST}"
-done
+echo "Adding NGINX ingress addon"
+#install_addon https://raw.githubusercontent.com/kubernetes/contrib/master/ingress/controllers/nginx/examples/daemonset/as-daemonset.yaml nginx-ingress.yaml
+install_addon https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik.yaml ingress-traefik.yaml
+install_addon https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/ui.yaml ingress-ui.yaml
+sed -e 's/traefik-ui.local/ingress-ui.k8s.local/g' -i /etc/kubernetes/addons/ingress-ui2.yaml
+
+#echo "Preparing Heapster, InfluxDB and Grafana as addons"
+#for MANIFEST in heapster-deployment.yaml heapster-service.yaml grafana-deployment.yaml grafana-service.yaml influxdb-deployment.yaml influxdb-service.yaml
+#do
+#  install_addon "https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/${MANIFEST}" "${MANIFEST}"
+#done
 
 # Install the addon manager as a direct kubelet manifest
 echo "Installing Addon Manager - to install/manage addons"
