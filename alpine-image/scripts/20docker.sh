@@ -11,4 +11,5 @@ echo -n 0 >/proc/sys/kernel/grsecurity/chroot_deny_mknod
 EOT
 rc-update add local boot
 
-
+reboot
+exit 0

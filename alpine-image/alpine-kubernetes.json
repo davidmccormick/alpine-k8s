@@ -10,9 +10,32 @@
   },
   "provisioners": [
     {
+      "type": "shell",
+      "scripts": [
+        "scripts/00base.sh",
+        "scripts/01alpine.sh",
+        "scripts/01networking.sh",
+        "scripts/02sshd.sh",
+        "scripts/03vagrant.sh",
+        "scripts/04sudoers.sh",
+        "scripts/05cron.sh",
+        "scripts/20docker.sh"
+      ],
+      "environment_vars": [
+        "DOCKER_VERSION={{user `docker_version`}}",
+        "KUBERNETES_VERSION={{user `kubernetes_version`}}"
+      ],
+      "override": {
+        "virtualbox-iso": {
+          "execute_command": "/bin/sh -c '{{ .Vars }} {{ .Path }}'"
+        }
+      }
+    },
+    {
+      "pause_before": "20s",
       "type": "file",
-      "source": "{{user `kubernetes_binaries`}}hyperkube",
-      "destination": "/usr/local/bin/hyperkube"
+      "source": "{{user `kubernetes_binaries`}}kubectl",
+      "destination": "/usr/local/bin/kubectl"
     },
     {
       "type": "file",
@@ -27,14 +50,6 @@
     {
       "type": "shell",
       "scripts": [
-        "scripts/00base.sh",
-        "scripts/01alpine.sh",
-        "scripts/01networking.sh",
-        "scripts/02sshd.sh",
-        "scripts/03vagrant.sh",
-        "scripts/04sudoers.sh",
-        "scripts/05cron.sh",
-        "scripts/20docker.sh",
         "scripts/25kubernetes.sh",
         "scripts/90virtualbox.sh",
         "scripts/99minimize.sh"

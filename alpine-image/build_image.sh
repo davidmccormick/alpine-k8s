@@ -32,7 +32,7 @@ PACKER_LOGS="false"
 # Where to download the Alpine ISO and Packages from.
 ALPINE_MIRROR='dl-cdn.alpinelinux.org'
 # Which Kubernetes components to build
-KUBERNETES_COMPONENTS="hyperkube kubectl kubelet kubeadm"
+KUBERNETES_COMPONENTS="kubectl kubeadm"
 
 # read command line args
 for i in "$@"
@@ -114,7 +114,7 @@ ALPINE_VERSION="${ALPINE_VERSION##*-}"
 #echo ""
 
 echo -n " Docker"
-DOCKER_VERSION=$(curl -s http://liskamm.alpinelinux.uk/edge/community/x86_64/ | grep "docker-[0-9]" | tail -1 | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
+DOCKER_VERSION=$(curl -s http://nl.alpinelinux.org/alpine/edge/community/x86_64/ | grep "docker-[0-9]" | tail -1 | sed -e 's/.apk.*$//' | sed -e 's/^.*docker-//' | sed -e 's/-.*$//')
 
 echo -n " Kubernetes"
 if [[ -z "${KUBERNETES_VERSION}" ]]; then
@@ -313,7 +313,6 @@ then
         atlas_box_create "${abox}" || exit 1
       else
         echo -e "Box ${abox} already exists."
-        [[ "${FORCE}" == "true" ]] || exit 0
       fi
     fi
   done

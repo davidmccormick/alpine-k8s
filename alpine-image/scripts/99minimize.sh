@@ -1,6 +1,10 @@
 
 set -ux
 
+# add in order to allow packer ssh access to provision
+# the system, remove here to make box more secure
+sed -i '/^PermitRootLogin yes/d' /etc/ssh/sshd_config
+
 echo "Clean up apk cache"
 rm -rf /var/cache/apk/*
 

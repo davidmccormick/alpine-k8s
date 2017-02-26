@@ -2,9 +2,9 @@ set -ux
 
 echo "Setting up remote repositories..."
 cat >/etc/apk/repositories <<EOT
-http://liskamm.alpinelinux.uk/edge/main/
-http://liskamm.alpinelinux.uk/edge/community/
-http://liskamm.alpinelinux.uk/edge/testing/
+http://nl.alpinelinux.org/alpine/edge/main/
+http://nl.alpinelinux.org/alpine/edge/community/
+http://nl.alpinelinux.org/alpine/edge/testing/
 EOT
 
 echo "Performing an update/upgrade"
