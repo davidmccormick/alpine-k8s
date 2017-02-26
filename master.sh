@@ -146,6 +146,3 @@ sed -e 's/traefik-ui.local/ingress-ui.k8s.local/g' -i /etc/kubernetes/addons/ing
 echo "Installing Addon Manager - to install/manage addons"
 curl -k -L -s https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/saltbase/salt/kube-addons/kube-addon-manager.yaml >/etc/kubernetes/manifests/addon-manager.yaml
 
-# Remove kubelet restarter
-[[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
-

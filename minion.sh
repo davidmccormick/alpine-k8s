@@ -14,8 +14,6 @@ kubeadm join --token "${KUBE_TOKEN}" ${MASTER_LB_IP}
 mkdir -p /root/.kube
 cp /etc/kubernetes/kubelet.conf /root/.kube/config
 
-# Remove kubelet restarter
-[[ -f "/etc/periodic/1min/kubelet" ]] && rm -f /etc/periodic/1min/kubelet
 rc-service kubelet restart
 
 

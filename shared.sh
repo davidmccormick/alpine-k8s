@@ -45,22 +45,8 @@ EOT
 mkdir -p /etc/kubernetes/manifests
 mkdir -p /etc/cni/net.d
 
-echo "Create kubelet service..."
-cat >/etc/init.d/kubelet <<EOT
-EOT
+echo "Run the kubelet service..."
 chmod +x /etc/init.d/kubelet
 rc-update add kubelet
 rc-service kubelet start
-
-cat >/etc/periodic/1min/kubelet <<EOT
-#!/bin/bash
-
-# checks for working kubelet and tries to restart it if it does not find one.
-
-if ! rc-service kubelet status
-then
-  rc-service kubelet restart
-fi
-EOT
-chmod +x /etc/periodic/1min/kubelet
 
