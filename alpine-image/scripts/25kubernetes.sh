@@ -23,6 +23,37 @@ docker pull gcr.io/google_containers/hyperkube:${KUBERNETES_VERSION}
 docker pull gcr.io/google_containers/hyperkube-amd64:${KUBERNETES_VERSION}
 service docker stop
 
+echo "Setup shared /var/lib/kubelet bind mount service..."
+cat >/etc/init.d/kubelet_bind_mount <<EOT
+#!/sbin/openrc-run 
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# \$Header: \$
+
+depend() {
+  need sysfs
+}
+
+start_pre() {
+  return 0
+}
+
+start() {
+  ebegin "Creating /var/lib/kubelet shared mount"
+  mkdir -p /var/lib/kubelet && \
+  mount --bind /var/lib/kubelet /var/lib/kubelet && \
+  mount --make-shared /var/lib/kubelet 
+  eend \$?
+}
+
+stop() {
+   ebegin "Umounting shared bind volume /var/lib/kubelet"
+   umount /var/lib/kubelet
+   eend \$?
+}
+EOT
+chmod +x /etc/init.d/kubelet_bind_mount
+
 echo "Create kubelet service..."
 cat >/etc/init.d/kubelet <<EOT
 #!/sbin/openrc-run 
@@ -34,6 +65,7 @@ depend() {
   need net
   need docker
   need sysfs
+  need kubelet_bind_mount
 }
 
 start_pre() {
@@ -49,7 +81,7 @@ start() {
        --volume=/sys:/sys:ro \
        --volume=/dev:/dev \
        --volume=/var/lib/docker/:/var/lib/docker:rw \
-       --volume=/var/lib/kubelet/:/var/lib/kubelet:rw \
+       --volume=/var/lib/kubelet/:/var/lib/kubelet:shared \
        --volume=/etc:/etc:rw \
        --volume=/opt:/opt:rw \
        --volume=/var/run:/var/run:rw \
@@ -78,6 +110,7 @@ stop() {
    eend \$?
 }
 EOT
+chmod +x /etc/init.d/kubelet
 
 exit 0
 
