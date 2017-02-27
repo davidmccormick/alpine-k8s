@@ -53,6 +53,7 @@ stop() {
 }
 EOT
 chmod +x /etc/init.d/kubelet_bind_mount
+rc-update add kubelet_bind_mount boot
 
 echo "Create kubelet service..."
 cat >/etc/init.d/kubelet <<EOT
