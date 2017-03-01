@@ -4,7 +4,7 @@ $etcd_count=1
 $etcd_memory=768
 $etcd_cpu=2
 
-$master_count=2
+$master_count=1
 $master_memory=2048
 $master_cpu=2
 
