@@ -25,21 +25,19 @@ route add -net 10.96.0.0/12 dev eth1
 
 cat <<EOT >/etc/hosts
 127.0.0.1	alpine-k8s.my.domain alpine-k8s localhost.localdomain localhost
-10.250.250.2    master1.example.com master1
-10.250.250.3    master2.example.com master2
-10.250.250.4    master3.example.com master3
-10.250.250.5    master4.example.com master4
-10.250.250.6    master5.example.com master5
-10.250.250.10   minion1.example.com minion1
-10.250.250.11   minion2.example.com minion2
-10.250.250.12   minion3.example.com minion3
-10.250.250.13   minion4.example.com minion4
-10.250.250.14   minion5.example.com minion5
-10.250.250.15   minion6.example.com minion6
-10.250.250.16   minion7.example.com minion7
-10.250.250.17   minion8.example.com minion8
-10.250.250.18   minion9.example.com minion9
-10.250.250.19   minion10.example.com minion10
+10.250.250.11   master1.example.com master1
+10.250.250.12   master2.example.com master2
+10.250.250.13   master3.example.com master3
+10.250.250.21   minion1.example.com minion1
+10.250.250.22   minion2.example.com minion2
+10.250.250.23   minion3.example.com minion3
+10.250.250.24   minion4.example.com minion4
+10.250.250.25   minion5.example.com minion5
+10.250.250.26   minion6.example.com minion6
+10.250.250.27   minion7.example.com minion7
+10.250.250.28   minion8.example.com minion8
+10.250.250.29   minion9.example.com minion9
+10.250.250.30   minion10.example.com minion10
 EOT
 
 mkdir -p /etc/kubernetes/manifests
