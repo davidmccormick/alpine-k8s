@@ -1,4 +1,4 @@
-$kubernetes_version="v1.5.3"
+$kubernetes_version="v1.5.4"
 
 $etcd_count=1
 $etcd_memory=768
