@@ -236,15 +236,20 @@ fi
 KUBERNETES_BINARIES="kubernetes-${KUBERNETES_VERSION#v}/_output/local/bin/linux/amd64/"
 mkdir -p ${KUBERNETES_BINARIES}
 export KUBERNETES_BINARIES
-
 echo -e "\nKubernetes binaries will be deployed from ${KUBERNETES_BINARIES}"
 
-echo -e "\nDo we need to build our Kubernetes build container 'kubebuild:alpine'?"
-if ! docker images | grep -e "kubebuild.*alpine"
+CNI_GOLANG_VER=`cat ${PWD}/kubernetes-${KUBERNETES_VERSION#v}/build/cni/Makefile | grep "^GOLANG_VERSION=" | sed -e 's/GOLANG_VERSION=//'` 
+echo "Building with CNI with golang version: ${CNI_GOLANG_VER}"
+
+echo -e "\nDo we need to build our Kubernetes build container 'kubebuild:alpine${CNI_GOLANG_VER}'?"
+if ! docker images | grep -e "kubebuild:alpine${CNI_GOLANG_VER}"
 then
-  echo -e "Building new 'kubebuild:alpine' container"
+  echo -e "Building new 'kubebuild:alpine${CNI_GOLANG_VER}' container"
+  TEMP_BUILD_DIR=$(mktemp -d)
+  pushd $PWD
+  cd $TEMP_BUILD_DIR
   cat >Dockerfile <<EOT
-FROM golang:alpine
+FROM golang:${CNI_GOLANG_VER}-alpine
 RUN apk update && apk add linux-headers bash grep git xz findutils which rsync coreutils alpine-sdk docker
 RUN go get -u github.com/jteeuwen/go-bindata/go-bindata
 ENTRYPOINT []
@@ -254,10 +259,12 @@ RUN adduser build -D -H -s /bin/bash -u $(id -u)
 RUN chown -R $(id -u) /usr/local/go /go
 USER $(id -u)
 EOT
-  echo "docker build --tag kubebuild:alpine ."
-  docker build --tag kubebuild:alpine .
+  echo "docker build --tag kubebuild:alpine${CNI_GOLANG_VER} ."
+  docker build --tag kubebuild:alpine${CNI_GOLANG_VER} --tag kubebuild:alpine .
+  popd
+  rm -rf $TEMP_BUILD_DIR
 else
-  echo -e "kubebuild:alpine already exists, skipping!\n"
+  echo -e "kubebuild:alpine${CNI_GOLANG_VER} already exists, skipping!\n"
 fi
 
 # Need to build cni separately
