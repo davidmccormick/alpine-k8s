@@ -43,8 +43,8 @@ EOT
 mkdir -p /etc/kubernetes/manifests
 mkdir -p /etc/cni/net.d
 
-echo "Run the kubelet service..."
-chmod +x /etc/init.d/kubelet
-rc-update add kubelet
-rc-service kubelet start
+#echo "Run the kubelet service..."
+#chmod +x /etc/init.d/kubelet
+#rc-update add kubelet
+#rc-service kubelet start
 

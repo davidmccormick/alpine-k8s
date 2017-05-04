@@ -7,11 +7,11 @@ echo "Using kubeadm binary from local http server"
 chmod +x /usr/local/bin/kubectl
 chmod +x /usr/local/bin/kubeadm
 
-echo "Installing CNI"
-mkdir -p /opt/cni /etc/kubernetes/manifests /etc/cni/net.d
-cd /opt/cni
-tar xvfpz /tmp/cni.tar.gz
-rm -f /tmp/cni.tar.gz
+#echo "Installing CNI"
+#mkdir -p /opt/cni /etc/kubernetes/manifests /etc/cni/net.d
+#cd /opt/cni
+#tar xvfpz /tmp/cni.tar.gz
+#rm -f /tmp/cni.tar.gz
 
 echo "Pre-loading the hyperkube image gcr.io/google_containers/hyperkube:${KUBERNETES_VERSION}..."
 service docker start
@@ -25,7 +25,7 @@ service docker stop
 
 echo "Setup shared /var/lib/kubelet bind mount service..."
 cat >/etc/init.d/kubelet_bind_mount <<EOT
-#!/sbin/openrc-run 
+#!/sbin/openrc-run
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # \$Header: \$
@@ -57,7 +57,7 @@ rc-update add kubelet_bind_mount boot
 
 echo "Create kubelet service..."
 cat >/etc/init.d/kubelet <<EOT
-#!/sbin/openrc-run 
+#!/sbin/openrc-run
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # \$Header: \$
@@ -78,7 +78,7 @@ start() {
   ebegin "Starting Kubelet"
   #start-stop-daemon --background --start --exec /usr/local/bin/kubelet --make-pidfile --pidfile /run/kubelet.pid --stdout /var/log/kubelet.log --stderr /var/log/kubelet.log    -- --require-kubeconfig --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=10.96.0.10 --cluster-domain=cluster.local --v=4 --hostname-override=MY_HOSTNAME --node-ip=MY_IPADDRESS
   MY_HOSTNAME=\`hostname\`
-  MY_IP=\`nslookup \$MY_HOSTNAME 2>&1 | grep '^Address" | awk '{print $3}'\`
+  MY_IP=\`nslookup \$MY_HOSTNAME 2>&1 | grep '^Address' | awk '{print \$3}'\`
   /usr/bin/docker run -d --restart=on-failure --name kubelet \
        --volume=/:/rootfs:ro \
        --volume=/sys:/sys:ro \
@@ -86,7 +86,6 @@ start() {
        --volume=/var/lib/docker/:/var/lib/docker:rw \
        --volume=/var/lib/kubelet/:/var/lib/kubelet:shared \
        --volume=/etc:/etc:rw \
-       --volume=/opt:/opt:rw \
        --volume=/var/run:/var/run:rw \
        --net=host --pid=host --privileged=true \
        gcr.io/google_containers/hyperkube:${KUBERNETES_VERSION} \

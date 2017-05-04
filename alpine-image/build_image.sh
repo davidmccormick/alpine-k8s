@@ -239,7 +239,7 @@ export KUBERNETES_BINARIES
 echo -e "\nKubernetes binaries will be deployed from ${KUBERNETES_BINARIES}"
 
 CNI_GOLANG_VER=`cat ${PWD}/kubernetes-${KUBERNETES_VERSION#v}/build/cni/Makefile | grep "^GOLANG_VERSION=" | sed -e 's/GOLANG_VERSION=//'` 
-echo "Building with CNI with golang version: ${CNI_GOLANG_VER}"
+#echo "Building with CNI with golang version: ${CNI_GOLANG_VER}"
 
 echo -e "\nDo we need to build our Kubernetes build container 'kubebuild:alpine${CNI_GOLANG_VER}'?"
 if ! docker images | grep -e "kubebuild:alpine${CNI_GOLANG_VER}"
@@ -268,24 +268,24 @@ else
 fi
 
 # Need to build cni separately
-echo "Checking for build of cni networking..."
-if ! [[ -f "${KUBERNETES_BINARIES}/cni.tar.gz" ]]; then
-  RETURN=${PWD}
-  cd kubernetes-${KUBERNETES_VERSION#v}/build/cni
-  sed -e 's/golang:[0-9.]*/kubebuild:alpine/' -i Makefile 
-  make
-  cd $RETURN 
-  cp kubernetes-${KUBERNETES_VERSION#v}/build/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
-else
-  echo -e "Kubernetes cni binaries already built."
-fi
+#echo "Checking for build of cni networking..."
+#if ! [[ -f "${KUBERNETES_BINARIES}/cni.tar.gz" ]]; then
+#  RETURN=${PWD}
+#  cd kubernetes-${KUBERNETES_VERSION#v}/build/cni
+#  sed -e 's/golang:[0-9.]*/kubebuild:alpine/' -i Makefile 
+#  make
+#  cd $RETURN 
+#  cp kubernetes-${KUBERNETES_VERSION#v}/build/cni/output/cni-amd64-*.tar.gz  ${KUBERNETES_BINARIES}/cni.tar.gz
+#else
+#  echo -e "Kubernetes cni binaries already built."
+#fi
 
 echo -e "\nChecking Kubernetes Components to build:-"
 for COMPONENT in ${KUBERNETES_COMPONENTS}; do
   echo -e "\nChecking if I need to build a new version of ${COMPONENT}..."
   if [[ ! -f "${KUBERNETES_BINARIES}/${COMPONENT}" ]]; then
     echo -e "Running kubebuild:alpine to build ${COMPONENT}"
-    docker run -it --rm -v ${PWD}/kubernetes-${KUBERNETES_VERSION#v}:/usr/src/myapp -v /var/run/docker.sock:/var/run/docker.sock -w /usr/src/myapp kubebuild:alpine /bin/bash -c "make ${COMPONENT}"
+    docker run -it --rm -v ${PWD}/kubernetes-${KUBERNETES_VERSION#v}:/usr/src/myapp -v /var/run/docker.sock:/var/run/docker.sock -w /usr/src/myapp kubebuild:alpine${CNI_GOLANG_VER} /bin/bash -c "make ${COMPONENT}"
   else
     echo -e "${COMPONENT} already exists, skipping build.\n"
   fi

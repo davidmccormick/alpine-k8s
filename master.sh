@@ -93,6 +93,10 @@ secrets:
   givenToken: ${KUBE_TOKEN}
 EOT
 
+echo "Starting kubelet..."
+rc-update add kubelet
+rc-service kubelet start
+
 echo "Running kubeadm init to configure kubernetes..."
 export KUBE_HYPERKUBE_IMAGE="gcr.io/google_containers/hyperkube:${KUBERNETES_VERSION}"
 echo "MY_IP is ${MY_IP}"

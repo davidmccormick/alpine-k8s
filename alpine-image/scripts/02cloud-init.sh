@@ -28,7 +28,8 @@ groups:
 # If this is set, 'root' will not be able to ssh in and they 
 # will get a message to login instead as the above \$user (ubuntu)
 disable_root: false
-#ssh_pwauth: true
+ssh_pwauth: true
+password: alpinek8s
 
 # This will cause the set+update hostname module to not operate (if true)
 # preserve_hostname: false
