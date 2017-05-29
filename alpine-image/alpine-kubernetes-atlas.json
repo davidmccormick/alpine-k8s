@@ -46,11 +46,6 @@
       "destination": "/usr/local/bin/kubeadm"
     },
     {
-      "type": "file",
-      "source": "{{user `kubernetes_binaries`}}cni.tar.gz",
-      "destination": "/tmp/cni.tar.gz"
-    },
-    {
       "type": "shell",
       "scripts": [
         "scripts/25kubernetes.sh",
