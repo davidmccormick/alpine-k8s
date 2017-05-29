@@ -30,7 +30,7 @@ AWS="false"
 PACKER_LOGS="false"
 
 # Where to download the Alpine ISO and Packages from.
-ALPINE_MIRROR='dl-cdn.alpinelinux.org'
+ALPINE_MIRROR='nl.alpinelinux.org'
 # Which Kubernetes components to build
 KUBERNETES_COMPONENTS="kubectl kubeadm"
 

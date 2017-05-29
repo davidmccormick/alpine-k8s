@@ -84,11 +84,11 @@
       "ssh_wait_timeout": "10m",
       "shutdown_command": "/sbin/poweroff",
 
-      "boot_wait": "20s",
+      "boot_wait": "40s",
       "boot_command": [
         "root<enter><wait>",
         "ifconfig eth0 up && udhcpc -i eth0<enter><wait>",
-        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
+        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait10>",
         "setup-alpine -f answers<enter><wait>",
         "vagrant<enter><wait>",
         "vagrant<enter><wait>",
